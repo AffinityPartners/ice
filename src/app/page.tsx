@@ -1,16 +1,20 @@
 'use client'
 
 import Image from "next/image";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/layout/Container";
 import { Section } from "@/components/layout/Section";
 import { Card } from "@/components/ui/Card";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
+import { Footer } from "@/components/layout/Footer";
+import { BlogCard } from "@/components/blog/BlogCard";
+import { getRecentPosts } from "@/data/blogPosts";
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       {/* Hero Section with Video Background - Enhanced */}
       <section className="relative h-[60vh] flex items-center justify-center overflow-hidden">
         {/* Background Video */}
@@ -78,7 +82,7 @@ export default function Home() {
       </Section>
 
       {/* Your Health Always Within Reach Section - Enhanced */}
-      <Section background="white" animate>
+      <Section background="gray-light" animate separator>
         <div className="grid lg:grid-cols-2 gap-16 items-stretch">
           {/* Left Content */}
           <motion.div
@@ -191,9 +195,8 @@ export default function Home() {
       </Section>
 
       {/* Easily Update Medical Profiles Section */}
-      <section className="py-20 px-4 bg-gray-50">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+      <Section background="blue-soft" animate separator>
+        <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Left Side - Device Mockups */}
             <div className="relative">
               <div className="flex items-center justify-center">
@@ -279,11 +282,10 @@ export default function Home() {
               </Button>
             </div>
           </div>
-        </div>
-      </section>
+      </Section>
 
       {/* How ICE Tracer Works Section - Enhanced */}
-      <Section background="white" animate>
+      <Section background="white" animate separator>
         <motion.h2 
           className="text-2xl md:text-3xl lg:text-4xl font-bold text-center text-[#245789] mb-20"
           initial={{ opacity: 0, y: 20 }}
@@ -377,7 +379,7 @@ export default function Home() {
         >
           <p className="text-gray-600 text-lg">
             Still Have Questions?{" "}
-            <a href="#" className="text-[#245789] underline font-medium hover:text-[#CA0015] transition-colors">
+            <a href="/faq" className="text-[#245789] underline font-medium hover:text-[#CA0015] transition-colors">
               Check out our FAQs.
             </a>
           </p>
@@ -385,8 +387,8 @@ export default function Home() {
       </Section>
 
       {/* Features Included in All Plans Section */}
-      <section id="features" className="py-20 px-4 bg-[#245789]">
-        <div className="max-w-7xl mx-auto">
+      <Section id="features" background="blue" animate separator>
+        <div className="relative">
           <h2 className="text-2xl md:text-3xl font-bold text-center text-white mb-16">
             Features Included in All Plans
           </h2>
@@ -529,188 +531,175 @@ export default function Home() {
             </div>
           </div>
         </div>
-      </section>
+      </Section>
 
       {/* Plans Section */}
-      <section id="plans" className="py-20 px-4 bg-white">
+      <Section id="plans" background="gray-light" animate separator>
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-center text-[#245789] mb-6">
-            Which Plan is Right for You?
-          </h2>
-          <p className="text-lg text-center text-gray-700 mb-4 max-w-4xl mx-auto">
-            Take control of your health by storing lifesaving medical and emergency contact information that can be accessed anywhere, 24 hours a day, 7 days a week.
-          </p>
-          <p className="text-center text-[#245789] font-medium mb-12">
-            -Easily Manage Multiple Profiles Under a Single Account-
-          </p>
-          
-          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            {/* Bronze Plan */}
-            <div className="bg-white rounded-lg shadow-lg border-2 border-[#245789] p-8 text-center">
-              <h3 className="text-3xl font-bold text-[#245789] mb-2">Bronze</h3>
-              <p className="text-4xl font-bold text-[#245789] mb-4">$4.99<span className="text-lg">/mo</span></p>
-              <p className="text-[#245789] font-medium mb-6">Manage Up to 3 Profiles</p>
-              
-              <div className="text-left space-y-3 mb-8">
-                <div className="flex items-center">
-                  <svg className="w-5 h-5 text-[#245789] mr-3" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                  <span className="text-gray-700">Personal Information</span>
-                </div>
-                <div className="flex items-center">
-                  <svg className="w-5 h-5 text-[#245789] mr-3" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                  <span className="text-gray-700">Vital Conditions</span>
-                </div>
-                <div className="flex items-center">
-                  <svg className="w-5 h-5 text-[#245789] mr-3" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                  <span className="text-gray-700">Allergies</span>
-                </div>
-                <div className="flex items-center">
-                  <svg className="w-5 h-5 text-[#245789] mr-3" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                  <span className="text-gray-700">Medical History</span>
-                </div>
-                <div className="flex items-center">
-                  <svg className="w-5 h-5 text-[#245789] mr-3" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                  <span className="text-gray-700">Emergency Contacts</span>
-                </div>
-                <div className="flex items-center">
-                  <svg className="w-5 h-5 text-[#245789] mr-3" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                  <span className="text-gray-700">Medications</span>
-                </div>
-                <div className="flex items-center">
-                  <svg className="w-5 h-5 text-[#245789] mr-3" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                  <span className="text-gray-700">Hospitalizations</span>
-                </div>
-                <div className="flex items-center">
-                  <svg className="w-5 h-5 text-[#245789] mr-3" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                  <span className="text-gray-700">Immunizations</span>
-                </div>
-                <div className="flex items-center">
-                  <svg className="w-5 h-5 text-[#245789] mr-3" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                  <span className="text-gray-700">Physicians</span>
-                </div>
-                <div className="flex items-center">
-                  <svg className="w-5 h-5 text-[#245789] mr-3" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                  <span className="text-gray-700">Advanced Directives</span>
-                </div>
-                <div className="flex items-center">
-                  <svg className="w-5 h-5 text-[#245789] mr-3" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                  <span className="text-gray-700">Store & Share Documents</span>
-                </div>
-              </div>
-              
-              <Button className="w-full" size="lg">
-                GET STARTED
-              </Button>
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-3xl md:text-4xl font-bold text-center text-[#245789] mb-6">
+              Which Plan is Right for You?
+            </h2>
+            <p className="text-lg text-center text-gray-700 mb-4 max-w-4xl mx-auto">
+              Take control of your health by storing lifesaving medical and emergency contact information that can be accessed anywhere, 24 hours a day, 7 days a week.
+            </p>
+            <div className="inline-block bg-gradient-to-r from-[#245789] to-[#2d6aa0] text-white px-6 py-2 rounded-full font-medium mb-12">
+              ✨ Easily Manage Multiple Profiles Under a Single Account
             </div>
+          </motion.div>
+          
+          <div className="grid md:grid-cols-2 gap-8 lg:gap-12 max-w-5xl mx-auto">
+            {/* Bronze Plan */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              viewport={{ once: true }}
+              className="group"
+            >
+              <div className="relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 border-2 border-[#245789]/20 hover:border-[#245789]/40 p-8 h-full flex flex-col group-hover:scale-105">
+                <div className="text-center mb-8">
+                  <div className="inline-block bg-gradient-to-r from-[#245789] to-[#2d6aa0] text-white px-4 py-1 rounded-full text-sm font-medium mb-4">
+                    STARTER
+                  </div>
+                  <h3 className="text-3xl font-bold text-[#245789] mb-2">Bronze</h3>
+                  <div className="flex items-center justify-center mb-2">
+                    <span className="text-4xl font-bold text-[#245789]">$4.99</span>
+                    <span className="text-gray-600 ml-2">/month</span>
+                  </div>
+                                     <p className="text-[#245789] font-medium bg-blue-50 py-2 px-4 rounded-lg">
+                     Manage Up to 3 Profiles
+                   </p>
+                </div>
+                
+                <div className="flex-1 mb-8">
+                  <h4 className="text-lg font-semibold text-gray-800 mb-4 text-center">Everything You Need:</h4>
+                  <div className="grid grid-cols-2 gap-x-2 gap-y-3">
+                    {[
+                      'Personal Information',
+                      'Vital Conditions',
+                      'Allergies',
+                      'Medical History',
+                      'Emergency Contacts',
+                      'Medications',
+                      'Hospitalizations',
+                      'Immunizations',
+                      'Physicians',
+                      'Advanced Directives',
+                      'Store & Share Documents'
+                    ].map((feature, index) => (
+                      <div key={index} className="flex items-start py-1">
+                        <div className="w-4 h-4 bg-gradient-to-r from-[#245789] to-[#2d6aa0] rounded-full flex items-center justify-center mr-2 flex-shrink-0 mt-0.5">
+                          <svg className="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                          </svg>
+                        </div>
+                        <span className="text-gray-700 text-sm leading-tight">{feature}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                
+                <Button 
+                  className="w-full bg-gradient-to-r from-[#245789] to-[#2d6aa0] hover:from-[#CA0015] hover:to-[#b8000f] text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105" 
+                  size="lg"
+                >
+                  GET STARTED
+                </Button>
+              </div>
+            </motion.div>
 
             {/* Silver Plan */}
-            <div className="bg-[#245789] rounded-lg shadow-lg p-8 text-center">
-              <h3 className="text-3xl font-bold text-white mb-2">Silver</h3>
-              <p className="text-4xl font-bold text-white mb-4">$11.99<span className="text-lg">/mo</span></p>
-              <p className="text-white font-medium mb-6">Manage Up to 10 Profiles</p>
-              
-              <div className="text-left space-y-3 mb-8">
-                <div className="flex items-center">
-                  <svg className="w-5 h-5 text-white mr-3" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                  <span className="text-white">Personal Information</span>
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+              viewport={{ once: true }}
+              className="group"
+            >
+              <div className="relative bg-gradient-to-br from-[#245789] via-[#2d6aa0] to-[#1e4a6b] rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 p-8 h-full flex flex-col group-hover:scale-105 border-4 border-[#CA0015]/20">
+                <div className="text-center mb-8">
+                  <div className="inline-block bg-gradient-to-r from-[#CA0015] to-[#b8000f] text-white px-4 py-1 rounded-full text-sm font-medium mb-4">
+                    BEST VALUE
+                  </div>
+                  <h3 className="text-3xl font-bold text-white mb-2">Silver</h3>
+                  <div className="flex items-center justify-center mb-2">
+                    <span className="text-4xl font-bold text-white">$11.99</span>
+                    <span className="text-white/80 ml-2">/month</span>
+                  </div>
+                                     <p className="text-white font-medium bg-white/20 backdrop-blur-sm py-2 px-4 rounded-lg">
+                     Manage Up to 10 Profiles
+                   </p>
                 </div>
-                <div className="flex items-center">
-                  <svg className="w-5 h-5 text-white mr-3" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                  <span className="text-white">Vital Conditions</span>
-                </div>
-                <div className="flex items-center">
-                  <svg className="w-5 h-5 text-white mr-3" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                  <span className="text-white">Allergies</span>
-                </div>
-                <div className="flex items-center">
-                  <svg className="w-5 h-5 text-white mr-3" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                  <span className="text-white">Medical History</span>
-                </div>
-                <div className="flex items-center">
-                  <svg className="w-5 h-5 text-white mr-3" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                  <span className="text-white">Emergency Contacts</span>
-                </div>
-                <div className="flex items-center">
-                  <svg className="w-5 h-5 text-white mr-3" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                  <span className="text-white">Medications</span>
-                </div>
-                <div className="flex items-center">
-                  <svg className="w-5 h-5 text-white mr-3" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                  <span className="text-white">Hospitalizations</span>
-                </div>
-                <div className="flex items-center">
-                  <svg className="w-5 h-5 text-white mr-3" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                  <span className="text-white">Immunizations</span>
-                </div>
-                <div className="flex items-center">
-                  <svg className="w-5 h-5 text-white mr-3" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                  <span className="text-white">Physicians</span>
-                </div>
-                <div className="flex items-center">
-                  <svg className="w-5 h-5 text-white mr-3" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                  <span className="text-white">Advanced Directives</span>
-                </div>
-                <div className="flex items-center">
-                  <svg className="w-5 h-5 text-white mr-3" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                  <span className="text-white">Store & Share Documents</span>
-                </div>
+                
+                <div className="flex-1 mb-8">
+                  <h4 className="text-lg font-semibold text-white mb-4 text-center">Everything in Bronze Plus:</h4>
+                  <div className="grid grid-cols-2 gap-x-2 gap-y-3">
+                    {[
+                      'Personal Information',
+                      'Vital Conditions',
+                      'Allergies',
+                      'Medical History',
+                      'Emergency Contacts',
+                      'Medications',
+                      'Hospitalizations',
+                      'Immunizations',
+                      'Physicians',
+                      'Advanced Directives',
+                      'Store & Share Documents'
+                    ].map((feature, index) => (
+                      <div key={index} className="flex items-start py-1">
+                        <div className="w-4 h-4 bg-gradient-to-r from-[#CA0015] to-[#b8000f] rounded-full flex items-center justify-center mr-2 flex-shrink-0 mt-0.5">
+                          <svg className="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                          </svg>
+                        </div>
+                        <span className="text-white text-sm leading-tight">{feature}</span>
+                      </div>
+                    ))}
+                                     </div>
+                 </div>
+                
+                <Button 
+                  className="w-full bg-gradient-to-r from-[#CA0015] to-[#b8000f] hover:from-white hover:to-gray-100 hover:text-[#245789] text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105" 
+                  size="lg"
+                >
+                  GET STARTED
+                </Button>
               </div>
-              
-              <Button className="w-full" size="lg">
-                GET STARTED
-              </Button>
-            </div>
+            </motion.div>
           </div>
+
+          {/* Money Back Guarantee */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.6 }}
+            viewport={{ once: true }}
+            className="text-center mt-12"
+          >
+            <div className="inline-flex items-center bg-green-50 text-green-800 px-6 py-3 rounded-full border border-green-200">
+              <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              </svg>
+              <span className="font-semibold">30-Day Money-Back Guarantee</span>
+            </div>
+            <p className="text-gray-600 mt-2 text-sm">
+              Not satisfied? Get your money back, no questions asked.
+            </p>
+          </motion.div>
         </div>
-      </section>
+      </Section>
 
       {/* Testimonials Section */}
-      <section className="py-20 px-4 bg-[#245789]">
-        <div className="max-w-7xl mx-auto">
+      <Section background="blue" animate separator>
+        <div className="relative">
           <h2 className="text-3xl md:text-4xl font-bold text-center text-white mb-6">
             Customers Love ICE Tracer
           </h2>
@@ -783,82 +772,49 @@ export default function Home() {
             </div>
           </div>
         </div>
-      </section>
+      </Section>
 
       {/* Blog Section - What's New */}
-      <section className="py-20 px-4 bg-white">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-center text-[#245789] mb-6">
-            What&apos;s New?
-          </h2>
-          <p className="text-lg text-center text-gray-700 mb-16 max-w-4xl mx-auto">
-            Don&apos;t leave your medical care to chance. ICE Tracer gives you peace of mind should you be involved in an accident and are unable to communicate your medical history or emergency contact information with First Responders.
-          </p>
-          
-          <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-            {/* Blog Post 1 */}
-            <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-              <div className="aspect-w-16 aspect-h-10">
-                <Image
-                  src="/images/Man_Defibrilator.png"
-                  alt="Man lying on the floor with EMS providing CPR with a defibrillator"
-                  width={500}
-                  height={256}
-                  className="w-full h-64 object-cover"
-                />
-              </div>
-              <div className="p-6">
-                <h3 className="text-xl font-bold text-[#245789] mb-3">
-                  Discover the Top 13 Reasons for EMS Calls
-                </h3>
-                <p className="text-gray-600 text-sm">
-                  June 30th, 2017
-                </p>
-              </div>
-            </div>
-
-            {/* Blog Post 2 */}
-            <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-              <div className="aspect-w-16 aspect-h-10">
-                <Image
-                  src="/images/heimlich-maneuver.png"
-                  alt="A person in a grey shirt is leaning over a person in a teal shirt who is laying on the ground, and is performing chest compressions as part of CPR"
-                  width={500}
-                  height={256}
-                  className="w-full h-64 object-cover"
-                />
-              </div>
-              <div className="p-6">
-                <h3 className="text-xl font-bold text-[#245789] mb-3">
-                  How to Perform the Heimlich Maneuver & CPR
-                </h3>
-                <p className="text-gray-600 text-sm">
-                  June 30th, 2017
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Navigation Arrows */}
-          <div className="flex justify-center items-center mt-12 space-x-4">
-            <button className="w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors">
-              <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
-            <div className="w-3 h-3 rounded-full bg-[#245789]"></div>
-            <button className="w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors">
-              <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <Section background="white" animate separator>
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          viewport={{ once: true }}
+        >
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-[#245789] mb-6">
+              What&apos;s New?
+            </h2>
+            <p className="text-lg text-gray-700 mb-8 max-w-4xl mx-auto">
+              Don&apos;t leave your medical care to chance. ICE Tracer gives you peace of mind should you be involved in an accident and are unable to communicate your medical history or emergency contact information with First Responders.
+            </p>
+            <Link 
+              href="/blog" 
+              className="inline-flex items-center text-[#245789] hover:text-[#CA0015] font-medium transition-colors"
+            >
+              View All Articles
+              <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
-            </button>
+            </Link>
           </div>
-        </div>
-      </section>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            {getRecentPosts(3).map((post) => (
+              <BlogCard
+                key={post.id}
+                post={post}
+                variant="default"
+              />
+            ))}
+          </div>
+        </motion.div>
+      </Section>
 
       {/* Final CTA Section */}
-      <section className="py-16 px-4 bg-[#245789]">
-        <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-8">
+      <Section background="blue" padding="md" animate separator>
+        <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
           <div className="flex-1 text-center lg:text-left">
             <p className="text-lg lg:text-xl text-white leading-relaxed">
               Sign up today and take the first step towards ensuring your health information is always within reach. Whether it&apos;s for yourself or a loved one, ICE Tracer offers the security and peace of mind that could save a life.
@@ -870,87 +826,10 @@ export default function Home() {
             </Button>
           </div>
         </div>
-      </section>
+      </Section>
 
       {/* Footer */}
-      <footer className="bg-gray-100 py-16 px-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-3 gap-12 mb-12">
-            {/* Left Column - Logo and CTA */}
-            <div className="lg:col-span-1">
-              <Image
-                src="/images/ICE-Tracer-Logo.png"
-                alt="ICE Tracer Logo"
-                width={150}
-                height={48}
-                className="h-12 mb-6"
-              />
-              <h3 className="text-2xl font-bold text-[#484848] mb-6">
-                Don&apos;t Leave Your Medical Care to Chance
-              </h3>
-              <button className="bg-[#245789] text-white px-8 py-3 rounded-lg font-bold hover:bg-[#1e4a75] transition-colors mb-6">
-                REGISTER NOW
-              </button>
-              
-              {/* Social Media Icons */}
-              <div className="flex space-x-4">
-                <a href="#" className="w-8 h-8 bg-[#245789] rounded flex items-center justify-center text-white hover:bg-[#1e4a75] transition-colors">
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/>
-                  </svg>
-                </a>
-                <a href="#" className="w-8 h-8 bg-[#245789] rounded flex items-center justify-center text-white hover:bg-[#1e4a75] transition-colors">
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M22.46 6c-.77.35-1.6.58-2.46.69.88-.53 1.56-1.37 1.88-2.38-.83.5-1.75.85-2.72 1.05C18.37 4.5 17.26 4 16 4c-2.35 0-4.27 1.92-4.27 4.29 0 .34.04.67.11.98C8.28 9.09 5.11 7.38 3 4.79c-.37.63-.58 1.37-.58 2.15 0 1.49.75 2.81 1.91 3.56-.71 0-1.37-.2-1.95-.5v.03c0 2.08 1.48 3.82 3.44 4.21a4.22 4.22 0 0 1-1.93.07 4.28 4.28 0 0 0 4 2.98 8.521 8.521 0 0 1-5.33 1.84c-.34 0-.68-.02-1.02-.06C3.44 20.29 5.7 21 8.12 21 16 21 20.33 14.46 20.33 8.79c0-.19 0-.37-.01-.56.84-.6 1.56-1.36 2.14-2.23z"/>
-                  </svg>
-                </a>
-                <a href="#" className="w-8 h-8 bg-[#245789] rounded flex items-center justify-center text-white hover:bg-[#1e4a75] transition-colors">
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-                  </svg>
-                </a>
-              </div>
-            </div>
-
-            {/* Right Columns - Links */}
-            <div className="lg:col-span-2 grid md:grid-cols-2 gap-8">
-              {/* Left Footer Links */}
-              <div>
-                <ul className="space-y-3">
-                  <li><a href="#" className="text-[#484848] hover:text-[#245789] transition-colors">Blog</a></li>
-                  <li><a href="#" className="text-[#484848] hover:text-[#245789] transition-colors">About</a></li>
-                  <li><a href="#" className="text-[#484848] hover:text-[#245789] transition-colors">Contact Us</a></li>
-                  <li><a href="#" className="text-[#484848] hover:text-[#245789] transition-colors">Warranty/Refund</a></li>
-                </ul>
-              </div>
-              
-              {/* Right Footer Links */}
-              <div>
-                <ul className="space-y-3">
-                  <li><a href="#" className="text-[#484848] hover:text-[#245789] transition-colors">FAQs</a></li>
-                  <li><a href="#" className="text-[#484848] hover:text-[#245789] transition-colors">Employer Groups</a></li>
-                  <li><a href="#" className="text-[#484848] hover:text-[#245789] transition-colors">Affiliate Program</a></li>
-                  <li><a href="#" className="text-[#484848] hover:text-[#245789] transition-colors">Affinity Partners</a></li>
-                </ul>
-              </div>
-            </div>
-          </div>
-
-          {/* Copyright and Bottom Links */}
-          <div className="border-t border-gray-300 pt-8">
-            <div className="flex flex-col lg:flex-row justify-between items-center gap-4">
-              <p className="text-[#484848] text-sm">
-                Copyright © ICE Tracer 2024 – All Rights Reserved
-              </p>
-              <div className="flex space-x-6">
-                <a href="#" className="text-[#484848] hover:text-[#245789] transition-colors text-sm">Privacy Policy</a>
-                <a href="#" className="text-[#484848] hover:text-[#245789] transition-colors text-sm">Terms & Conditions</a>
-                <a href="#" className="text-[#484848] hover:text-[#245789] transition-colors text-sm">Security</a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

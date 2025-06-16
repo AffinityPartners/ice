@@ -2,15 +2,17 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 
 export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
-  variant?: 'default' | 'outline' | 'ghost';
+  variant?: 'default' | 'outline' | 'ghost' | 'elevated' | 'soft';
 }
 
 const Card = React.forwardRef<HTMLDivElement, CardProps>(
   ({ className, variant = 'default', ...props }, ref) => {
     const variantClasses = {
-      default: 'bg-white border border-gray-200 shadow-sm',
-      outline: 'border border-gray-200',
-      ghost: 'shadow-none border-0',
+      default: 'bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200',
+      outline: 'border border-gray-200 bg-white hover:border-gray-300 transition-colors duration-200',
+      ghost: 'shadow-none border-0 bg-transparent',
+      elevated: 'bg-white border border-gray-100 shadow-lg hover:shadow-xl transition-shadow duration-300',
+      soft: 'bg-gradient-to-br from-gray-50 to-white border border-gray-100 shadow-sm hover:shadow-md transition-all duration-200',
     };
 
     return (
@@ -47,7 +49,7 @@ const CardTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <h3
     ref={ref}
-    className={cn('text-2xl font-semibold leading-none tracking-tight', className)}
+    className={cn('text-2xl font-bold leading-none tracking-tight', className)}
     {...props}
   />
 ));

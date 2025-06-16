@@ -2,12 +2,11 @@ import type { Metadata } from "next";
 import { Lato } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/layout/Header";
-import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 
 const lato = Lato({ 
   subsets: ["latin"],
-  weight: ["100", "300", "400", "700", "900"],
+  weight: ["300", "400", "700"],
   display: 'swap',
   variable: '--font-lato'
 });
@@ -20,6 +19,11 @@ export const metadata: Metadata = {
   },
   description: "ICE Tracer provides instant access to critical medical information during emergencies. Store and share your medical profile with first responders and healthcare providers.",
   keywords: "emergency medical information, ICE, medical profile, first responders, healthcare, emergency contacts, medical ID, emergency response",
+  icons: {
+    icon: '/images/Favicon-512x512-copy.png',
+    shortcut: '/images/Favicon-512x512-copy.png',
+    apple: '/images/Favicon-512x512-copy.png',
+  },
   openGraph: {
     type: 'website',
     locale: 'en_US',
@@ -61,16 +65,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${lato.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`${lato.variable}`}>
       <body className={lato.className}>
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
-          <ErrorBoundary>
-            <div className="min-h-screen bg-white dark:bg-gray-900">
-              <Header />
-              <main className="flex-1">{children}</main>
-            </div>
-          </ErrorBoundary>
-        </ThemeProvider>
+        <ErrorBoundary>
+          <div className="min-h-screen bg-white">
+            <Header />
+            <main className="flex-1">{children}</main>
+          </div>
+        </ErrorBoundary>
       </body>
     </html>
   );

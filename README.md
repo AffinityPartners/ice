@@ -78,7 +78,6 @@ No environment variables are required for the basic setup.
 - ✅ Optimized for Vercel deployment
 - ✅ Security headers configured
 - ✅ Responsive design
-- ✅ Dark mode support
 
 ## Learn More
 

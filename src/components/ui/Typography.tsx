@@ -15,13 +15,13 @@ export function Typography({
   as
 }: TypographyProps) {
   const variants = {
-    h1: 'text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-gray-900 dark:text-white',
-    h2: 'text-2xl md:text-3xl lg:text-4xl font-semibold tracking-tight text-gray-900 dark:text-white',
-    h3: 'text-xl md:text-2xl font-semibold text-gray-900 dark:text-white',
-    h4: 'text-lg md:text-xl font-medium text-gray-900 dark:text-white',
-    body: 'text-base leading-relaxed text-gray-700 dark:text-gray-300',
-    caption: 'text-sm text-gray-500 dark:text-gray-400',
-    label: 'text-sm font-medium text-gray-700 dark:text-gray-300',
+    h1: 'text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900',
+    h2: 'text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900',
+    h3: 'text-xl md:text-2xl font-bold text-gray-900',
+    h4: 'text-lg md:text-xl font-normal text-gray-900',
+    body: 'text-base text-gray-700',
+    caption: 'text-sm text-gray-500',
+    label: 'text-sm font-normal text-gray-700',
   }
 
   const Component = as || (variant.startsWith('h') ? variant : 'p')

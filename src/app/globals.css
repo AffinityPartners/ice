@@ -12,8 +12,10 @@
 
   html {
     scroll-behavior: smooth;
-    font-feature-settings: 'cv11', 'ss01';
+    font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;
     font-variant: normal;
+    font-size: 16px;
+    text-size-adjust: 100%;
   }
 
   html,
@@ -24,6 +26,7 @@
 
   body {
     font-family: var(--font-lato), system-ui, sans-serif;
+    font-size: 1rem;
     line-height: 1.6;
     color: theme('colors.gray.900');
     background-color: theme('colors.white');
@@ -31,11 +34,7 @@
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-  }
-
-  .dark body {
-    color: theme('colors.gray.100');
-    background-color: theme('colors.gray.900');
+    font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;
   }
 
   a {
@@ -68,6 +67,37 @@
     text-wrap: balance;
   }
   
+  /* Typography utilities for consistent Lato usage */
+  .font-lato-light {
+    font-family: var(--font-lato), system-ui, sans-serif;
+    font-weight: 300;
+  }
+  
+  .font-lato-normal {
+    font-family: var(--font-lato), system-ui, sans-serif;
+    font-weight: 400;
+  }
+  
+  .font-lato-bold {
+    font-family: var(--font-lato), system-ui, sans-serif;
+    font-weight: 700;
+  }
+  
+  /* Consistent body text class */
+  .body-text {
+    font-size: 1rem;
+    line-height: 1.6;
+    font-weight: 400;
+    color: theme('colors.gray.700');
+  }
+  
+  /* Heading base styles */
+  .heading-text {
+    line-height: 1.25;
+    color: theme('colors.gray.900');
+    font-weight: 700;
+  }
+  
   /* Loading states */
   .loading-shimmer {
     background: linear-gradient(90deg, 
@@ -77,15 +107,6 @@
     );
     background-size: 200% 100%;
     animation: shimmer 2s infinite;
-  }
-
-  .dark .loading-shimmer {
-    background: linear-gradient(90deg, 
-      theme('colors.gray.700') 25%, 
-      theme('colors.gray.600') 50%, 
-      theme('colors.gray.700') 75%
-    );
-    background-size: 200% 100%;
   }
 
   @keyframes shimmer {

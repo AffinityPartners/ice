@@ -37,7 +37,7 @@ Websites should express unique brand identity in ways that make them instantly r
 - **Primary Color**: Choose a distinctive accent color that represents your brand
 - **Application**: Apply consistently to interactive elements (buttons, links, form fields, CTAs)
 - **Accessibility**: Ensure sufficient contrast ratios for WCAG compliance
-- **Flexibility**: Consider how the color works across light and dark themes
+- **Flexibility**: Consider how the color works across different backgrounds and contexts
 
 ##### Typography Strategy
 - **Brand Font**: If strongly associated with a specific typeface, ensure it's web-optimized and accessible
@@ -140,7 +140,6 @@ const config: Config = {
     },
   },
   plugins: [],
-  darkMode: 'class',
 }
 export default config
 ```
@@ -193,85 +192,10 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 )
 ```
 
-### Dark Mode Implementation
-
-#### Next.js Theme Provider Setup
-```tsx
-// providers/ThemeProvider.tsx
-'use client'
-
-import { ThemeProvider as NextThemesProvider } from 'next-themes'
-import { type ThemeProviderProps } from 'next-themes/dist/types'
-
-export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
-  return <NextThemesProvider {...props}>{children}</NextThemesProvider>
-}
-
-// app/layout.tsx
-import { ThemeProvider } from '@/providers/ThemeProvider'
-
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
-  return (
-    <html lang="en" suppressHydrationWarning>
-      <body>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          {children}
-        </ThemeProvider>
-      </body>
-    </html>
-  )
-}
-```
-
-#### Theme Toggle Component
-```tsx
-// components/ui/ThemeToggle.tsx
-'use client'
-
-import { useTheme } from 'next-themes'
-import { useEffect, useState } from 'react'
-
-export function ThemeToggle() {
-  const [mounted, setMounted] = useState(false)
-  const { theme, setTheme } = useTheme()
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  if (!mounted) {
-    return null
-  }
-
-  return (
-    <button
-      onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-      className={cn(
-        'rounded-lg p-2 transition-colors',
-        'bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700'
-      )}
-    >
-      {theme === 'dark' ? '🌙' : '☀️'}
-    </button>
-  )
-}
-```
-
 ### Quality Checklist
 - [ ] Tailwind color configuration includes all brand and semantic colors
-- [ ] Dark mode implementation works seamlessly with next-themes
-- [ ] Color contrast meets WCAG AA standards in both themes
+- [ ] Color contrast meets WCAG AA standards
 - [ ] Components use consistent color variants and proper hover states
-- [ ] Theme toggle provides smooth transitions between light/dark modes
 
 ---
 
@@ -489,7 +413,6 @@ export function Grid({ children, cols = 3, gap = 'md', className }: GridProps) {
 ```tsx
 // app/layout.tsx
 import { Inter } from 'next/font/google'
-import { ThemeProvider } from '@/providers/ThemeProvider'
 import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
 import './globals.css'
@@ -502,15 +425,13 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en">
       <body className={inter.className}>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <div className="min-h-screen bg-white dark:bg-gray-900">
-            <Navbar />
-            <main className="flex-1">{children}</main>
-            <Footer />
-          </div>
-        </ThemeProvider>
+        <div className="min-h-screen bg-white">
+          <Navbar />
+          <main className="flex-1">{children}</main>
+          <Footer />
+        </div>
       </body>
     </html>
   )
@@ -556,7 +477,6 @@ export function GlassCard({ children, className, intensity = 'medium' }: GlassCa
     <div
       className={cn(
         'rounded-xl border shadow-lg',
-        'dark:bg-gray-900/20 dark:border-gray-700/30',
         intensityClasses[intensity],
         className
       )}
@@ -593,7 +513,7 @@ export function Card({ children, elevation = 1, interactive = false, className }
   return (
     <div
       className={cn(
-        'rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700',
+        'rounded-lg bg-white border border-gray-200',
         elevationClasses[elevation],
         interactive && 'transition-all duration-200 hover:shadow-lg hover:-translate-y-1 cursor-pointer',
         className
@@ -607,7 +527,6 @@ export function Card({ children, elevation = 1, interactive = false, className }
 
 ### Quality Checklist
 - [ ] Glass morphism effects use Tailwind's backdrop-blur utilities
-- [ ] Material components support light and dark themes
 - [ ] Elevation system uses consistent Tailwind shadow classes
 - [ ] Interactive materials provide smooth hover transitions
 - [ ] Components are accessible with proper focus states
@@ -782,13 +701,13 @@ export function Typography({
   as
 }: TypographyProps) {
   const variants = {
-    h1: 'text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-gray-900 dark:text-white',
-    h2: 'text-3xl md:text-4xl font-semibold tracking-tight text-gray-900 dark:text-white',
-    h3: 'text-2xl md:text-3xl font-semibold text-gray-900 dark:text-white',
-    h4: 'text-xl md:text-2xl font-medium text-gray-900 dark:text-white',
-    body: 'text-base leading-relaxed text-gray-700 dark:text-gray-300',
-    caption: 'text-sm text-gray-500 dark:text-gray-400',
-    label: 'text-sm font-medium text-gray-700 dark:text-gray-300',
+    h1: 'text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-gray-900',
+    h2: 'text-3xl md:text-4xl font-semibold tracking-tight text-gray-900',
+    h3: 'text-2xl md:text-3xl font-semibold text-gray-900',
+    h4: 'text-xl md:text-2xl font-medium text-gray-900',
+    body: 'text-base leading-relaxed text-gray-700',
+    caption: 'text-sm text-gray-500',
+    label: 'text-sm font-medium text-gray-700',
   }
 
   const Component = as || (variant.startsWith('h') ? variant : 'p')
@@ -836,7 +755,7 @@ module.exports = {
 - [ ] Typography components use consistent Tailwind classes
 - [ ] Font loading prevents layout shift with font-display: swap
 - [ ] Typography scales responsively across breakpoints
-- [ ] Text maintains proper contrast in light and dark modes
+- [ ] Text maintains proper contrast ratios
 
 ---
 
@@ -965,7 +884,7 @@ export function ContactForm({ onSubmit, className }: ContactFormProps) {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className={cn('space-y-6', className)}>
       <div>
-        <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label htmlFor="email" className="block text-sm font-medium text-gray-700">
           Email
         </label>
         <input
@@ -975,7 +894,6 @@ export function ContactForm({ onSubmit, className }: ContactFormProps) {
           className={cn(
             'mt-1 block w-full rounded-md border border-gray-300 px-3 py-2',
             'focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500',
-            'dark:border-gray-600 dark:bg-gray-800 dark:text-white',
             errors.email && 'border-red-500'
           )}
         />
@@ -985,7 +903,7 @@ export function ContactForm({ onSubmit, className }: ContactFormProps) {
       </div>
 
       <div>
-        <label htmlFor="message" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label htmlFor="message" className="block text-sm font-medium text-gray-700">
           Message
         </label>
         <textarea
@@ -995,7 +913,6 @@ export function ContactForm({ onSubmit, className }: ContactFormProps) {
           className={cn(
             'mt-1 block w-full rounded-md border border-gray-300 px-3 py-2',
             'focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500',
-            'dark:border-gray-600 dark:bg-gray-800 dark:text-white',
             errors.message && 'border-red-500'
           )}
         />
@@ -1016,9 +933,8 @@ export function ContactForm({ onSubmit, className }: ContactFormProps) {
 - [ ] Components use Tailwind classes with proper responsive variants
 - [ ] TypeScript interfaces are defined for all component props
 - [ ] Form validation uses Zod schemas with React Hook Form
-- [ ] Components support light and dark mode variants
-- [ ] Accessibility attributes are included (ARIA labels, focus management)
 - [ ] Components are properly exported and documented
+- [ ] Accessibility attributes are included (ARIA labels, focus management)
 
 ---
 
@@ -2441,7 +2357,7 @@ Your Master Design Guide now includes **15 comprehensive sections** covering eve
 
 ### **🎨 Core Design Foundation**
 1. **Branding Guidelines** - Voice, identity, strategic placement
-2. **Color Guidelines** - Tailwind implementation, dark mode
+2. **Color Guidelines** - Tailwind implementation, semantic colors
 3. **Image Guidelines** - Next.js optimization, responsive images, Vercel config
 4. **Layout Guidelines** - CSS Grid, Flexbox, responsive containers
 5. **Materials & Effects** - Glass morphism, elevation, visual hierarchy

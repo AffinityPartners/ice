@@ -10,9 +10,10 @@ interface SectionProps {
   className?: string
   containerSize?: 'sm' | 'md' | 'lg' | 'xl' | 'full'
   padding?: 'none' | 'sm' | 'md' | 'lg' | 'xl'
-  background?: 'white' | 'gray' | 'blue' | 'transparent'
+  background?: 'white' | 'gray' | 'gray-light' | 'blue' | 'blue-light' | 'blue-soft' | 'transparent'
   animate?: boolean
   id?: string
+  separator?: boolean
 }
 
 export function Section({
@@ -22,6 +23,7 @@ export function Section({
   padding = 'lg',
   background = 'transparent',
   animate = false,
+  separator = false,
   id,
 }: SectionProps) {
   const paddingClasses = {
@@ -35,18 +37,29 @@ export function Section({
   const backgroundClasses = {
     white: 'bg-white',
     gray: 'bg-gray-50',
+    'gray-light': 'bg-[#f9f9f9]',
     blue: 'bg-[#245789]',
+    'blue-light': 'bg-blue-50',
+    'blue-soft': 'bg-gradient-to-br from-blue-50 to-slate-50',
     transparent: 'bg-transparent',
   }
+
+  const sectionClasses = cn(
+    paddingClasses[padding],
+    backgroundClasses[background],
+    {
+      'border-t border-gray-100': separator && (background === 'white' || background === 'gray-light'),
+      'border-t border-blue-100': separator && (background === 'blue-light' || background === 'blue-soft'),
+      'shadow-sm': background === 'white' || background === 'gray-light',
+      'shadow-md': background === 'blue-light' || background === 'blue-soft',
+    },
+    className
+  )
 
   const sectionContent = (
     <section
       id={id}
-      className={cn(
-        paddingClasses[padding],
-        backgroundClasses[background],
-        className
-      )}
+      className={sectionClasses}
     >
       <Container size={containerSize}>
         {children}
