@@ -789,7 +789,7 @@ export default function Home() {
       <section className="py-20 px-4 bg-white">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center text-[#245789] mb-6">
-            What's New?
+            What&apos;s New?
           </h2>
           <p className="text-lg text-center text-gray-700 mb-16 max-w-4xl mx-auto">
             Don&apos;t leave your medical care to chance. ICE Tracer gives you peace of mind should you be involved in an accident and are unable to communicate your medical history or emergency contact information with First Responders.
@@ -861,7 +861,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-8">
           <div className="flex-1 text-center lg:text-left">
             <p className="text-lg lg:text-xl text-white leading-relaxed">
-              Sign up today and take the first step towards ensuring your health information is always within reach. Whether it's for yourself or a loved one, ICE Tracer offers the security and peace of mind that could save a life.
+              Sign up today and take the first step towards ensuring your health information is always within reach. Whether it&apos;s for yourself or a loved one, ICE Tracer offers the security and peace of mind that could save a life.
             </p>
           </div>
           <div className="flex-shrink-0">
