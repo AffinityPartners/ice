@@ -49,7 +49,7 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
-            ICE Tracer is an advanced medical ID system that offers a seamless way to store, manage, and access your and your family's vital health information securely anytime, anywhere in the event of an emergency.
+            ICE Tracer is an advanced medical ID system that offers a seamless way to store, manage, and access your and your family&apos;s vital health information securely anytime, anywhere in the event of an emergency.
           </motion.p>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -92,7 +92,7 @@ export default function Home() {
               Your Health, Always Within Reach
             </h2>
             <p className="text-gray-700 text-base md:text-lg mb-10 leading-relaxed">
-              In emergencies, every second counts. ICE Tracer is a revolutionary cloud-based service that securely stores your comprehensive medical profile, making it instantly accessible to First Responders through ID cards or wearable devices. With ICE Tracer, your critical health information is always at hand, providing peace of mind when you can't communicate.
+              In emergencies, every second counts. ICE Tracer is a revolutionary cloud-based service that securely stores your comprehensive medical profile, making it instantly accessible to First Responders through ID cards or wearable devices. With ICE Tracer, your critical health information is always at hand, providing peace of mind when you can&apos;t communicate.
             </p>
               
               <h3 className="text-xl md:text-2xl font-bold text-[#245789] mb-8">
@@ -197,9 +197,11 @@ export default function Home() {
             {/* Left Side - Device Mockups */}
             <div className="relative">
               <div className="flex items-center justify-center">
-                <img
+                <Image
                   src="/images/ICE-Profile-Image-2024-HQ.png"
                   alt="ICE Tracer medical profile interface"
+                  width={800}
+                  height={600}
                   className="w-full h-auto max-w-2xl"
                 />
               </div>
@@ -393,9 +395,11 @@ export default function Home() {
             {/* Personal Information */}
             <div className="text-center text-white">
               <div className="w-20 h-20 mx-auto mb-4 flex items-center justify-center">
-                <img
+                <Image
                   src="/images/personalinfo.png"
                   alt="Personal Information"
+                  width={64}
+                  height={64}
                   className="w-16 h-16"
                 />
               </div>
@@ -408,39 +412,45 @@ export default function Home() {
             {/* Physicians */}
             <div className="text-center text-white">
               <div className="w-20 h-20 mx-auto mb-4 flex items-center justify-center">
-                <img
+                <Image
                   src="/images/physicians.png"
                   alt="Physicians"
+                  width={64}
+                  height={64}
                   className="w-16 h-16"
                 />
               </div>
               <h3 className="text-xl font-bold mb-4">Physicians</h3>
               <p className="text-white/90 leading-relaxed">
-                List your healthcare provider's contact information to ensure easy access during both emergency and non-emergency situations.
+                List your healthcare provider&apos;s contact information to ensure easy access during both emergency and non-emergency situations.
               </p>
             </div>
 
             {/* Insurance */}
             <div className="text-center text-white">
               <div className="w-20 h-20 mx-auto mb-4 flex items-center justify-center">
-                <img
+                <Image
                   src="/images/insurance.png"
                   alt="Insurance"
+                  width={64}
+                  height={64}
                   className="w-16 h-16"
                 />
               </div>
               <h3 className="text-xl font-bold mb-4">Insurance</h3>
               <p className="text-white/90 leading-relaxed">
-                Store your insurance information online for easy access during accidents, doctor's appointments, and prescription pickups.
+                Store your insurance information online for easy access during accidents, doctor&apos;s appointments, and prescription pickups.
               </p>
             </div>
 
             {/* Emergency Contacts */}
             <div className="text-center text-white">
               <div className="w-20 h-20 mx-auto mb-4 flex items-center justify-center">
-                <img
+                <Image
                   src="/images/emergencycontacts.png"
                   alt="Emergency Contacts"
+                  width={64}
+                  height={64}
                   className="w-16 h-16"
                 />
               </div>
@@ -453,9 +463,11 @@ export default function Home() {
             {/* Health Conditions */}
             <div className="text-center text-white">
               <div className="w-20 h-20 mx-auto mb-4 flex items-center justify-center">
-                <img
+                <Image
                   src="/images/healthconditions.png"
                   alt="Health Conditions"
+                  width={64}
+                  height={64}
                   className="w-16 h-16"
                 />
               </div>
@@ -468,9 +480,11 @@ export default function Home() {
             {/* Medications */}
             <div className="text-center text-white">
               <div className="w-20 h-20 mx-auto mb-4 flex items-center justify-center">
-                <img
+                <Image
                   src="/images/medications.png"
                   alt="Medications"
+                  width={64}
+                  height={64}
                   className="w-16 h-16"
                 />
               </div>
@@ -483,9 +497,11 @@ export default function Home() {
             {/* Hospitalizations */}
             <div className="text-center text-white">
               <div className="w-20 h-20 mx-auto mb-4 flex items-center justify-center">
-                <img
+                <Image
                   src="/images/hospitalizations.png"
                   alt="Hospitalizations"
+                  width={64}
+                  height={64}
                   className="w-16 h-16"
                 />
               </div>
@@ -498,9 +514,11 @@ export default function Home() {
             {/* Documents */}
             <div className="text-center text-white">
               <div className="w-20 h-20 mx-auto mb-4 flex items-center justify-center">
-                <img
+                <Image
                   src="/images/documents.png"
                   alt="Documents"
+                  width={64}
+                  height={64}
                   className="w-16 h-16"
                 />
               </div>
@@ -749,7 +767,7 @@ export default function Home() {
                 Security and Reliability
               </h3>
               <p className="text-gray-700 leading-relaxed mb-6">
-                In case of emergency, I'm more secure because my critical medical information is readily available with ICE Tracer. In addition to providing a comprehensive platform for storing and updating my medical history, medications, and emergency contacts. If you want a reliable and efficient way to ensure your safety and well-being,
+                In case of emergency, I&apos;m more secure because my critical medical information is readily available with ICE Tracer. In addition to providing a comprehensive platform for storing and updating my medical history, medications, and emergency contacts. If you want a reliable and efficient way to ensure your safety and well-being,
               </p>
               <div className="flex items-center">
                 <div className="w-8 h-8 bg-[#CA0015] rounded-full flex items-center justify-center mr-3">
@@ -774,16 +792,18 @@ export default function Home() {
             What's New?
           </h2>
           <p className="text-lg text-center text-gray-700 mb-16 max-w-4xl mx-auto">
-            Don't leave your medical care to chance. ICE Tracer gives you peace of mind should you be involved in an accident and are unable to communicate your medical history or emergency contact information with First Responders.
+            Don&apos;t leave your medical care to chance. ICE Tracer gives you peace of mind should you be involved in an accident and are unable to communicate your medical history or emergency contact information with First Responders.
           </p>
           
           <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
             {/* Blog Post 1 */}
             <div className="bg-white rounded-lg shadow-lg overflow-hidden">
               <div className="aspect-w-16 aspect-h-10">
-                <img
+                <Image
                   src="/images/Man_Defibrilator.png"
                   alt="Man lying on the floor with EMS providing CPR with a defibrillator"
+                  width={500}
+                  height={256}
                   className="w-full h-64 object-cover"
                 />
               </div>
@@ -800,9 +820,11 @@ export default function Home() {
             {/* Blog Post 2 */}
             <div className="bg-white rounded-lg shadow-lg overflow-hidden">
               <div className="aspect-w-16 aspect-h-10">
-                <img
+                <Image
                   src="/images/heimlich-maneuver.png"
                   alt="A person in a grey shirt is leaning over a person in a teal shirt who is laying on the ground, and is performing chest compressions as part of CPR"
+                  width={500}
+                  height={256}
                   className="w-full h-64 object-cover"
                 />
               </div>
@@ -856,13 +878,15 @@ export default function Home() {
           <div className="grid lg:grid-cols-3 gap-12 mb-12">
             {/* Left Column - Logo and CTA */}
             <div className="lg:col-span-1">
-              <img
+              <Image
                 src="/images/ICE-Tracer-Logo.png"
                 alt="ICE Tracer Logo"
+                width={150}
+                height={48}
                 className="h-12 mb-6"
               />
               <h3 className="text-2xl font-bold text-[#484848] mb-6">
-                Don't Leave Your Medical Care to Chance
+                Don&apos;t Leave Your Medical Care to Chance
               </h3>
               <button className="bg-[#245789] text-white px-8 py-3 rounded-lg font-bold hover:bg-[#1e4a75] transition-colors mb-6">
                 REGISTER NOW
