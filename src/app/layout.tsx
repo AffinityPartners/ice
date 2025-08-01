@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { Lato } from "next/font/google";
 import "./globals.css";
-import { Header } from "@/components/layout/Header";
+import { ConditionalHeader } from "@/components/layout/ConditionalHeader";
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
+import { SessionProvider } from "@/components/providers/SessionProvider";
 
 const lato = Lato({ 
   subsets: ["latin"],
@@ -67,12 +68,14 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${lato.variable}`}>
       <body className={lato.className}>
-        <ErrorBoundary>
-          <div className="min-h-screen bg-white">
-            <Header />
-            <main className="flex-1">{children}</main>
-          </div>
-        </ErrorBoundary>
+        <SessionProvider>
+          <ErrorBoundary>
+            <div className="min-h-screen bg-white">
+              <ConditionalHeader />
+              <main className="flex-1">{children}</main>
+            </div>
+          </ErrorBoundary>
+        </SessionProvider>
       </body>
     </html>
   );

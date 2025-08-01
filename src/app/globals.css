@@ -14,7 +14,7 @@
     scroll-behavior: smooth;
     font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;
     font-variant: normal;
-    font-size: 16px;
+    font-size: 18px; /* Increased base font size for better readability */
     text-size-adjust: 100%;
   }
 
@@ -59,6 +59,75 @@
       animation-iteration-count: 1 !important;
       transition-duration: 0.01ms !important;
     }
+  }
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 220 13% 13%;
+    --card: 0 0% 100%;
+    --card-foreground: 220 13% 13%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 13% 13%;
+    --primary: 210 58% 33%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 353 100% 40%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 210 8% 92%;
+    --muted-foreground: 220 12% 35%;
+    --accent: 210 58% 33%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 353 100% 40%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 214 20% 85%;
+    --input: 214 20% 85%;
+    --ring: 210 58% 33%;
+    --chart-1: 210 58% 33%;
+    --chart-2: 353 100% 40%;
+    --chart-3: 142 71% 45%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 200 80% 60%;
+    --radius: 0.5rem;
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 240 10% 3.9%;
+    --sidebar-primary: 210 58% 33%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 210 40% 96.1%;
+    --sidebar-accent-foreground: 222.2 47.4% 11.2%;
+    --sidebar-border: 214.3 31.8% 91.4%;
+    --sidebar-ring: 210 58% 33%;
+  }
+  .dark {
+    --background: 222 47% 7%;
+    --foreground: 0 0% 95%;
+    --card: 222 47% 11%;
+    --card-foreground: 0 0% 95%;
+    --popover: 222 47% 11%;
+    --popover-foreground: 0 0% 95%;
+    --primary: 210 100% 70%;
+    --primary-foreground: 222 47% 7%;
+    --secondary: 353 100% 60%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 217 15% 22%;
+    --muted-foreground: 215 15% 75%;
+    --accent: 217 19% 27%;
+    --accent-foreground: 0 0% 95%;
+    --destructive: 0 62% 50%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 217 15% 35%;
+    --input: 217 15% 35%;
+    --ring: 210 100% 70%;
+    --chart-1: 210 100% 70%;
+    --chart-2: 353 100% 60%;
+    --chart-3: 142 71% 45%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 200 80% 60%;
+    --sidebar-background: 222 47% 11%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 210 100% 70%;
+    --sidebar-primary-foreground: 222 47% 11%;
+    --sidebar-accent: 217 19% 27%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 217 19% 27%;
+    --sidebar-ring: 210 100% 70%;
   }
 }
 
@@ -112,5 +181,70 @@
   @keyframes shimmer {
     0% { background-position: -200% 0; }
     100% { background-position: 200% 0; }
+  }
+  
+  /* Admin Dashboard Specific Styles */
+  /* Enhanced text sizes for admin dashboard */
+  .admin-heading-xl {
+    @apply text-3xl font-bold tracking-tight;
+  }
+  
+  .admin-heading-lg {
+    @apply text-2xl font-semibold;
+  }
+  
+  .admin-heading-md {
+    @apply text-xl font-medium;
+  }
+  
+  .admin-text-base {
+    @apply text-base leading-relaxed;
+  }
+  
+  .admin-text-sm {
+    @apply text-sm leading-relaxed;
+  }
+  
+  /* Card and component styles */
+  .admin-card {
+    @apply rounded-xl border bg-card shadow-sm transition-all hover:shadow-md;
+  }
+  
+  .admin-card-colored {
+    @apply rounded-xl border-0 shadow-sm transition-all hover:shadow-lg hover:scale-[1.02];
+  }
+  
+  /* Button enhancements */
+  .admin-button-primary {
+    @apply bg-primary text-primary-foreground hover:bg-primary/90 px-6 py-2.5 text-base font-medium rounded-lg transition-all hover:scale-105 shadow-sm hover:shadow-md;
+  }
+  
+  /* Stat card styles */
+  .admin-stat-value {
+    @apply text-4xl font-bold tracking-tight;
+  }
+  
+  .admin-stat-label {
+    @apply text-base text-muted-foreground font-medium;
+  }
+  
+  /* Table enhancements */
+  .admin-table th {
+    @apply text-base font-semibold;
+  }
+  
+  .admin-table td {
+    @apply text-base;
+  }
+}
+
+
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
   }
 }

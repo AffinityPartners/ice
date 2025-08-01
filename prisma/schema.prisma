@@ -1,0 +1,344 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// User model with support for different roles
+model User {
+  id            String          @id @default(cuid())
+  name          String?
+  email         String?         @unique
+  emailVerified DateTime?
+  image         String?
+  role          Role            @default(USER)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  password      String?
+  firstName     String?
+  lastName      String?
+  phone         String?
+  bio           String?
+  accounts      Account[]
+  activityLogs  ActivityLog[]
+  affiliate     Affiliate?
+  affiliateNotes AffiliateNote[]
+  sessions      Session[]
+
+  @@index([email], map: "idx_user_email")
+  @@index([role], map: "idx_user_role")
+}
+
+// NextAuth required models
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// Blog functionality
+model Post {
+  id              String        @id @default(cuid())
+  title           String
+  slug            String        @unique
+  excerpt         String?
+  content         String
+  image           String?
+  published       Boolean       @default(false)
+  author          String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  metaTitle       String?
+  metaDescription String?
+  metaKeywords    String?
+  ogImage         String?
+  canonicalUrl    String?
+  featuredOrder   Int?
+  viewCount       Int?          @default(0)
+  readingTime     Int?
+  tags            String[]      @default([])
+  publishedAt     DateTime?
+  categoryId      String?       @db.VarChar(255)
+  category        BlogCategory? @relation(fields: [categoryId], references: [id])
+
+  @@index([published, publishedAt], map: "idx_post_published_publishedat")
+  @@index([slug], map: "idx_post_slug")
+  @@index([tags], map: "idx_post_tags", type: Gin)
+  @@index([categoryId], map: "idx_post_category_id")
+}
+
+model BlogCategory {
+  id          String    @id @default(dbgenerated("(gen_random_uuid())::text")) @db.VarChar(255)
+  name        String
+  slug        String    @unique
+  description String?
+  isActive    Boolean?  @default(true)
+  createdAt   DateTime? @default(now())
+  updatedAt   DateTime? @default(now()) @updatedAt
+  posts       Post[]
+
+  @@index([slug], map: "idx_blog_category_slug")
+}
+
+// FAQ functionality
+model FAQCategory {
+  id          String    @id @default(dbgenerated("substr(md5(((random())::text || (clock_timestamp())::text)), 1, 25)"))
+  name        String
+  slug        String    @unique
+  description String?
+  order       Int?      @default(0)
+  isActive    Boolean?  @default(true)
+  createdAt   DateTime? @default(now())
+  updatedAt   DateTime? @default(now()) @updatedAt
+  faqs        FAQ[]
+
+  @@index([slug], map: "idx_faq_category_slug")
+}
+
+model FAQ {
+  id         String       @id @default(dbgenerated("substr(md5(((random())::text || (clock_timestamp())::text)), 1, 25)"))
+  question   String
+  answer     String
+  categoryId String?
+  order      Int?         @default(0)
+  isActive   Boolean?     @default(true)
+  createdAt  DateTime?    @default(now())
+  updatedAt  DateTime?    @default(now()) @updatedAt
+  category   FAQCategory? @relation(fields: [categoryId], references: [id], onUpdate: NoAction, map: "fk_faq_category")
+
+  @@index([categoryId], map: "idx_faq_category_id")
+}
+
+// Activity logging
+model ActivityLog {
+  id        String   @id @default(cuid())
+  actorId   String
+  actorRole Role
+  action    String
+  target    String?
+  metadata  Json?
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+  actor     User     @relation(fields: [actorId], references: [id], onDelete: Cascade)
+
+  @@index([actorId], map: "idx_activity_log_actor_id")
+  @@index([actorRole], map: "idx_activity_log_actor_role")
+  @@index([action], map: "idx_activity_log_action")
+  @@index([createdAt], map: "idx_activity_log_created_at")
+}
+
+// Global configuration
+model GlobalConfig {
+  id                  String   @id @default(cuid())
+  defaultHeroHeading  String   @default("Your Emergency Information When It Matters Most")
+  defaultHeroSubtext  String   @default("Secure, instant access to critical medical and contact information")
+  defaultCtaText      String   @default("Get ICE Tracer Today")
+  defaultPrimaryColor String   @default("#245789")
+  defaultHeroImage    String?
+  bannerText          String?
+  bannerActive        Boolean  @default(false)
+  updatedAt           DateTime @updatedAt
+  firstName           String?
+  lastName            String?
+  contactEmail        String?
+  phoneNumber         String?
+  ctaProfileImage     String?
+  ctaQuote            String?
+  scheduleCallLink    String?
+  ctaButtonLink       String?
+}
+
+// Affiliate model for partner tracking
+model Affiliate {
+  id                         String           @id @default(cuid())
+  userId                     String           @unique
+  slug                       String           @unique
+  companyName                String?
+  logoUrl                    String?
+  primaryColor               String?          @default("#245789")
+  heroHeading                String?
+  heroSubtext                String?
+  ctaText                    String?
+  visits                     Int              @default(0)
+  conversions                Int              @default(0)
+  createdAt                  DateTime         @default(now())
+  updatedAt                  DateTime         @updatedAt
+  isActive                   Boolean?         @default(true)
+  firstName                  String?
+  lastName                   String?
+  contactEmail               String?
+  ctaProfileImage            String?
+  ctaQuote                   String?
+  scheduleCallLink           String?
+  businessName               String?
+  website                    String?
+  socialMedia                Json?            @default("{}")
+  bio                        String?
+  phoneNumber                String?          @db.VarChar(255)
+  ctaButtonLink              String?
+
+  // Stripe Connect fields
+  stripeAccountId            String?          @unique @map("stripe_account_id")
+  stripeOnboardingComplete   Boolean?         @default(false) @map("stripe_onboarding_complete")
+  stripeDashboardUrl         String?          @map("stripe_dashboard_url")
+  stripeChargesEnabled       Boolean?         @default(false) @map("stripe_charges_enabled")
+  stripePayoutsEnabled       Boolean?         @default(false) @map("stripe_payouts_enabled")
+  stripeDisabledReason       String?          @map("stripe_disabled_reason")
+  stripeOnboardingUrl        String?          @map("stripe_onboarding_url")
+  totalEarnedCents           Int?             @default(0) @map("total_earned_cents")
+  unpaidBalanceCents         Int?             @default(0) @map("unpaid_balance_cents")
+  lastPayoutDate             DateTime?        @map("last_payout_date") @db.Timestamp(6)
+  lastPayoutAmountCents      Int?             @map("last_payout_amount_cents")
+  adminNotes                 String?          @map("admin_notes")
+  flaggedForReview           Boolean?         @default(false) @map("flagged_for_review")
+  notifyOnPayout             Boolean?         @default(true) @map("notify_on_payout")
+  notifyOnReferral           Boolean?         @default(true) @map("notify_on_referral")
+
+  user                       User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  referrals                  Referral[]
+  commissionLogs             commission_log[]
+  payoutLogs                 payout_log[]
+  notes                      AffiliateNote[]
+
+  @@index([businessName])
+  @@index([stripeAccountId])
+}
+
+// Referral tracking
+model Referral {
+  id             String           @id @default(cuid())
+  affiliateId    String
+  customerEmail  String
+  customerName   String?
+  status         ReferralStatus   @default(PENDING)
+  policyNumber   String?
+  commission     Float?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  affiliate      Affiliate        @relation(fields: [affiliateId], references: [id], onDelete: Cascade)
+  commission_log commission_log[]
+}
+
+// Commission tracking
+model commission_log {
+  id           String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  affiliate_id String?
+  referral_id  String?
+  amount_cents Int?
+  source       String?
+  created_at   DateTime?  @default(now()) @db.Timestamp(6)
+  is_paid      Boolean?   @default(false)
+  Affiliate    Affiliate? @relation(fields: [affiliate_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  Referral     Referral?  @relation(fields: [referral_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+// Payout tracking
+model payout_log {
+  id                 String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  affiliate_id       String?
+  stripe_transfer_id String?
+  amount_cents       Int?
+  created_at         DateTime?  @default(now()) @db.Timestamp(6)
+  status             String?
+  notes              String?
+  Affiliate          Affiliate? @relation(fields: [affiliate_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+// Affiliate notes
+model AffiliateNote {
+  id          String       @id @default(cuid())
+  affiliateId String
+  authorId    String
+  title       String
+  content     String
+  priority    NotePriority @default(MEDIUM)
+  category    NoteCategory @default(GENERAL)
+  isResolved  Boolean      @default(false)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  affiliate   Affiliate @relation(fields: [affiliateId], references: [id], onDelete: Cascade)
+  author      User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([affiliateId])
+  @@index([authorId])
+  @@index([priority])
+  @@index([category])
+  @@index([createdAt])
+  @@index([isResolved])
+}
+
+// Password reset functionality
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  email     String
+  token     String   @unique
+  expires   DateTime
+  createdAt DateTime @default(now())
+
+  @@index([email])
+}
+
+// Enums
+enum Role {
+  ADMIN
+  USER
+  AFFILIATE
+}
+
+enum ReferralStatus {
+  PENDING
+  CONVERTED
+  CANCELLED
+  EXPIRED
+}
+
+enum NotePriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum NoteCategory {
+  GENERAL
+  COMPLIANCE
+  PAYMENT
+  PERFORMANCE
+  COMMUNICATION
+  TECHNICAL
+  MARKETING
+}

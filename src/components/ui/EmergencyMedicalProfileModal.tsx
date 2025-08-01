@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Modal from './Modal';
-import { Button } from './Button';
+import { Button } from './button';
 
 interface EmergencyMedicalProfileModalProps {
   isOpen: boolean;

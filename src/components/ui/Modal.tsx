@@ -1,16 +1,19 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { Button } from './Button';
+import { FaTimes } from 'react-icons/fa';
 
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   children: React.ReactNode;
   title?: string;
-  maxWidth?: 'sm' | 'md' | 'lg' | 'xl';
+  maxWidth?: 'sm' | 'md' | 'lg' | 'xl' | 'full';
+  showCloseButton?: boolean;
+  closeOnOverlayClick?: boolean;
+  className?: string;
 }
 
 const Modal: React.FC<ModalProps> = ({ 
@@ -18,14 +21,30 @@ const Modal: React.FC<ModalProps> = ({
   onClose, 
   children, 
   title,
-  maxWidth = 'md' 
+  maxWidth = 'md',
+  showCloseButton = true,
+  closeOnOverlayClick = true,
+  className
 }) => {
   const maxWidthClasses = {
     sm: 'max-w-sm',
     md: 'max-w-md',
     lg: 'max-w-lg',
     xl: 'max-w-xl',
+    full: 'max-w-full mx-4',
   };
+
+  // Close on Escape key
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        onClose();
+      }
+    };
+
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [isOpen, onClose]);
 
   return (
     <AnimatePresence>
@@ -37,7 +56,7 @@ const Modal: React.FC<ModalProps> = ({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
-            onClick={onClose}
+            onClick={closeOnOverlayClick ? onClose : undefined}
           />
           
           {/* Modal Container */}
@@ -49,7 +68,8 @@ const Modal: React.FC<ModalProps> = ({
               transition={{ duration: 0.2 }}
               className={cn(
                 'relative w-full rounded-lg bg-white shadow-xl',
-                maxWidthClasses[maxWidth]
+                maxWidthClasses[maxWidth],
+                className
               )}
             >
               {/* Header */}
@@ -58,25 +78,15 @@ const Modal: React.FC<ModalProps> = ({
                   <h2 className="text-xl font-semibold text-gray-900">
                     {title}
                   </h2>
-                  <button
-                    onClick={onClose}
-                    className="text-gray-400 hover:text-gray-600 transition-colors"
-                    aria-label="Close modal"
-                  >
-                    <svg
-                      className="w-6 h-6"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
+                  {showCloseButton && (
+                    <button
+                      onClick={onClose}
+                      className="text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-lg hover:bg-gray-100"
+                      aria-label="Close modal"
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M6 18L18 6M6 6l12 12"
-                      />
-                    </svg>
-                  </button>
+                      <FaTimes className="w-5 h-5" />
+                    </button>
+                  )}
                 </div>
               )}
               

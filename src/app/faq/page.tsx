@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import { Container } from "@/components/layout/Container";
 import { Section } from "@/components/layout/Section";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { Footer } from "@/components/layout/Footer";
 
@@ -180,7 +180,7 @@ function AccordionItem({ question, answer, isOpen, onToggle }: {
   onToggle: () => void; 
 }) {
   return (
-    <Card variant="outline" className="mb-4">
+    <Card className="mb-4 border">
       <button
         onClick={onToggle}
         className="w-full text-left p-6 focus:outline-none focus:ring-2 focus:ring-[#245789] focus:ring-offset-2 rounded-lg"

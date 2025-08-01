@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import { Container } from "@/components/layout/Container";
 import { Section } from "@/components/layout/Section";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import { Footer } from "@/components/layout/Footer";
 
 export default function WarrantyRefundPage() {
@@ -43,7 +43,7 @@ export default function WarrantyRefundPage() {
               transition={{ duration: 0.6 }}
               viewport={{ once: true }}
             >
-              <Card variant="elevated" className="p-8">
+              <Card className="p-8 shadow-lg">
                 <CardHeader>
                   <CardTitle className="text-2xl md:text-3xl text-[#245789] border-b-2 border-[#245789] pb-4 mb-6">
                     Warranty
@@ -117,7 +117,7 @@ export default function WarrantyRefundPage() {
               transition={{ duration: 0.6, delay: 0.2 }}
               viewport={{ once: true }}
             >
-              <Card variant="elevated" className="p-8">
+              <Card className="p-8 shadow-lg">
                 <CardHeader>
                   <CardTitle className="text-2xl md:text-3xl text-[#245789] border-b-2 border-[#245789] pb-4 mb-6">
                     Refund Policy
@@ -180,7 +180,7 @@ export default function WarrantyRefundPage() {
               transition={{ duration: 0.6, delay: 0.3 }}
               viewport={{ once: true }}
             >
-              <Card variant="elevated" className="p-8">
+              <Card className="p-8 shadow-lg">
                 <CardHeader>
                   <CardTitle className="text-2xl md:text-3xl text-[#245789] border-b-2 border-[#245789] pb-4 mb-6">
                     Exchanges
@@ -201,7 +201,7 @@ export default function WarrantyRefundPage() {
               transition={{ duration: 0.6, delay: 0.4 }}
               viewport={{ once: true }}
             >
-              <Card variant="elevated" className="p-8 bg-gradient-to-r from-[#245789] to-[#1e4a75] text-white">
+              <Card className="p-8 bg-gradient-to-r from-[#245789] to-[#1e4a75] text-white shadow-lg">
                 <CardHeader>
                   <CardTitle className="text-2xl md:text-3xl text-white border-b-2 border-white pb-4 mb-6">
                     Contact Us
