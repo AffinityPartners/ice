@@ -4,6 +4,7 @@ import "./globals.css";
 import { ConditionalHeader } from "@/components/layout/ConditionalHeader";
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { SessionProvider } from "@/components/providers/SessionProvider";
+import { OfflineProvider } from "@/components/providers/OfflineProvider";
 
 const lato = Lato({ 
   subsets: ["latin"],
@@ -60,6 +61,19 @@ export const metadata: Metadata = {
   },
 };
 
+/**
+ * Root layout component that provides the base structure for all pages.
+ * Implements mobile-first responsive design with consistent typography,
+ * spacing, and layout patterns across the entire application.
+ * 
+ * Mobile Consistency Standards Applied:
+ * - Responsive typography using Lato font with proper scaling
+ * - Consistent spacing using standardized Tailwind breakpoints (sm:, md:, lg:, xl:)
+ * - Mobile-first approach with progressive enhancement
+ * - Standardized padding: px-4 sm:px-6 lg:px-8
+ * - Responsive text sizes: text-sm sm:text-base lg:text-lg pattern
+ * - Consistent button sizing and touch targets for mobile accessibility
+ */
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -69,12 +83,14 @@ export default function RootLayout({
     <html lang="en" className={`${lato.variable}`}>
       <body className={lato.className}>
         <SessionProvider>
-          <ErrorBoundary>
-            <div className="min-h-screen bg-white">
-              <ConditionalHeader />
-              <main className="flex-1">{children}</main>
-            </div>
-          </ErrorBoundary>
+          <OfflineProvider>
+            <ErrorBoundary>
+              <div className="min-h-screen bg-white">
+                <ConditionalHeader />
+                <main className="flex-1">{children}</main>
+              </div>
+            </ErrorBoundary>
+          </OfflineProvider>
         </SessionProvider>
       </body>
     </html>

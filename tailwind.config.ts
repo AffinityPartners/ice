@@ -19,6 +19,13 @@ const config: Config = {
   				'sans-serif'
   			]
   		},
+  		screens: {
+  			'xs': '475px',
+  			'touch': {'raw': '(hover: none) and (pointer: coarse)'},
+  		},
+  		spacing: {
+  			'15': '15px',
+  		},
   		fontSize: {
   			xs: [
   				'0.75rem',

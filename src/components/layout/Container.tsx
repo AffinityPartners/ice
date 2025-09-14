@@ -7,6 +7,11 @@ interface ContainerProps {
   className?: string
 }
 
+/**
+ * Container component that provides consistent responsive width constraints and padding.
+ * Implements mobile-first design with standardized breakpoint behavior across the site.
+ * Uses consistent horizontal padding that scales appropriately on different screen sizes.
+ */
 export function Container({ children, size = 'lg', className }: ContainerProps) {
   const sizeClasses = {
     sm: 'max-w-2xl',
@@ -17,7 +22,7 @@ export function Container({ children, size = 'lg', className }: ContainerProps) 
   }
 
   return (
-    <div className={cn('mx-auto px-4 sm:px-6 lg:px-8', sizeClasses[size], className)}>
+    <div className={cn('mx-auto px-[15px] sm:px-6 lg:px-8', sizeClasses[size], className)}>
       {children}
     </div>
   )

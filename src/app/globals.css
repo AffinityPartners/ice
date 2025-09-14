@@ -182,6 +182,287 @@
     0% { background-position: -200% 0; }
     100% { background-position: 200% 0; }
   }
+
+  /* Enhanced shimmer animation for mobile loading states */
+  .animate-shimmer {
+    animation: shimmer 2s infinite;
+  }
+  
+  /* Mobile-First Responsive Utilities */
+  .mobile-heading-xl {
+    @apply text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight;
+  }
+  
+  .mobile-heading-lg {
+    @apply text-xl sm:text-2xl lg:text-3xl font-semibold;
+  }
+  
+  .mobile-text-responsive {
+    @apply text-sm sm:text-base lg:text-lg;
+  }
+  
+  .mobile-spacing-y {
+    @apply space-y-4 sm:space-y-6 lg:space-y-8;
+  }
+  
+  .mobile-padding {
+    @apply px-[15px] sm:px-6 lg:px-8;
+  }
+  
+  /* Specific 15px padding utilities for maximum mobile space usage */
+  .mobile-padding-15 {
+    @apply px-[15px];
+  }
+  
+  .mobile-container-15 {
+    @apply mx-auto px-[15px] sm:px-6 lg:px-8;
+  }
+  
+  /* Touch-Optimized Utilities */
+  .touch-target {
+    @apply min-h-[44px] min-w-[44px] touch-manipulation;
+  }
+  
+  .touch-button {
+    @apply min-h-[44px] px-4 py-2 touch-manipulation;
+  }
+  
+  .touch-link {
+    @apply min-h-[44px] py-2 px-1 touch-manipulation;
+  }
+  
+  /* Mobile Form Utilities */
+  .mobile-input {
+    @apply min-h-[44px] text-base; /* Prevents iOS zoom */
+  }
+  
+  .mobile-form-spacing {
+    @apply space-y-6; /* Better spacing for touch */
+  }
+  
+  /* Mobile Animation Utilities */
+  .mobile-smooth-scroll {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .mobile-backdrop-blur {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+  
+  /* Performance Optimized Animations for Mobile */
+  .mobile-optimized-animation {
+    transform: translateZ(0); /* Force hardware acceleration */
+    will-change: transform; /* Hint browser about upcoming changes */
+    backface-visibility: hidden; /* Improve rendering performance */
+  }
+  
+  .mobile-fade-in {
+    animation: mobileOptimizedFadeIn 0.3s ease-out forwards;
+  }
+  
+  .mobile-slide-up {
+    animation: mobileOptimizedSlideUp 0.4s ease-out forwards;
+  }
+  
+  @keyframes mobileOptimizedFadeIn {
+    from {
+      opacity: 0;
+      transform: translateZ(0);
+    }
+    to {
+      opacity: 1;
+      transform: translateZ(0);
+    }
+  }
+  
+  @keyframes mobileOptimizedSlideUp {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 20px, 0);
+    }
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+  }
+  
+  /* Mobile-specific performance optimizations */
+  @media (max-width: 768px) {
+    * {
+      /* Reduce paint complexity on mobile */
+      -webkit-tap-highlight-color: transparent;
+    }
+    
+    /* Force proper text wrapping on mobile */
+    h1, h2, h3, h4, h5, h6, p, div {
+      max-width: 100% !important;
+      overflow-wrap: break-word !important;
+      word-wrap: break-word !important;
+      hyphens: auto;
+      -webkit-hyphens: auto;
+      -moz-hyphens: auto;
+    }
+    
+    /* Prevent horizontal overflow */
+    body, html {
+      overflow-x: hidden !important;
+      max-width: 100vw !important;
+    }
+    
+    /* Ensure all containers respect mobile boundaries */
+    .container, section, div {
+      max-width: 100% !important;
+      box-sizing: border-box !important;
+    }
+    
+    /* Feature row fixes for mobile text clipping */
+    .feature-row {
+      display: flex !important;
+      flex-wrap: wrap !important;
+      flex-direction: column !important;
+      align-items: flex-start !important;
+    }
+    
+    .feature-text {
+      min-width: 0 !important;
+      overflow-wrap: anywhere !important;
+      word-break: normal !important;
+      hyphens: auto !important;
+    }
+    
+    .feature-row, .feature-text, .feature-card {
+      overflow: visible !important;
+    }
+    
+    .section-container {
+      box-sizing: border-box !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      padding: 0 15px !important;
+      height: auto !important;
+    }
+    
+    /* Optimize images for mobile */
+    img {
+      image-rendering: -webkit-optimize-contrast;
+      image-rendering: optimize-contrast;
+      max-width: 100% !important;
+      height: auto !important;
+    }
+    
+    /* Improve scroll performance */
+    .scroll-container {
+      -webkit-overflow-scrolling: touch;
+      overflow-scrolling: touch;
+    }
+    
+    /* Optimize animations for mobile */
+    @media (prefers-reduced-motion: no-preference) {
+      .animate-pulse {
+        animation-duration: 1.5s; /* Slower on mobile to reduce CPU usage */
+      }
+    }
+  }
+  
+  /* Container Query Support and Adaptive Layouts */
+  .adaptive-container {
+    container-type: inline-size;
+    container-name: adaptive;
+  }
+  
+  /* Container query fallbacks using ResizeObserver */
+  .container-xs { --container-size: 'xs'; }
+  .container-sm { --container-size: 'sm'; }
+  .container-md { --container-size: 'md'; }
+  .container-lg { --container-size: 'lg'; }
+  .container-xl { --container-size: 'xl'; }
+  
+  /* Adaptive grid utilities */
+  .adaptive-grid {
+    display: grid;
+    grid-template-columns: repeat(var(--container-columns, 1), minmax(0, 1fr));
+    gap: var(--container-gap, 1rem);
+  }
+  
+  /* Dynamic spacing utilities */
+  .dynamic-spacing-y {
+    --spacing-xs: 0.5rem;
+    --spacing-sm: 1rem;
+    --spacing-md: 1.5rem;
+    --spacing-lg: 2rem;
+    --spacing-xl: 3rem;
+  }
+  
+  .dynamic-spacing-y > * + * {
+    margin-top: var(--current-spacing, var(--spacing-md));
+  }
+  
+  /* Responsive text utilities with container awareness */
+  .adaptive-text-xs { font-size: clamp(0.75rem, 2vw, 0.875rem); }
+  .adaptive-text-sm { font-size: clamp(0.875rem, 2.5vw, 1rem); }
+  .adaptive-text-base { font-size: clamp(1rem, 3vw, 1.125rem); }
+  .adaptive-text-lg { font-size: clamp(1.125rem, 3.5vw, 1.25rem); }
+  .adaptive-text-xl { font-size: clamp(1.25rem, 4vw, 1.5rem); }
+  .adaptive-text-2xl { font-size: clamp(1.5rem, 5vw, 1.875rem); }
+  .adaptive-text-3xl { font-size: clamp(1.875rem, 6vw, 2.25rem); }
+  
+  /* Mobile-optimized scroll behavior */
+  .smooth-scroll {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  @supports (scroll-behavior: smooth) {
+    .smooth-scroll {
+      scroll-behavior: smooth;
+    }
+  }
+  
+  /* Hardware acceleration utilities */
+  .transform-gpu {
+    transform: translateZ(0);
+    will-change: transform;
+  }
+  
+  .transform-gpu-auto {
+    will-change: auto;
+  }
+  
+  /* Feature row layout fixes */
+  .feature-row-fix {
+    display: flex;
+    flex-wrap: wrap;
+    overflow: visible;
+  }
+  
+  .feature-text-fix {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    word-break: normal;
+    hyphens: auto;
+    overflow: visible;
+  }
+  
+  .section-container-fix {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+  
+  @media (max-width: 768px) {
+    .feature-row-fix {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    
+    .section-container-fix {
+      padding: 0 15px;
+    }
+  }
   
   /* Admin Dashboard Specific Styles */
   /* Enhanced text sizes for admin dashboard */

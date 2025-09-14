@@ -28,10 +28,10 @@ export function Section({
 }: SectionProps) {
   const paddingClasses = {
     none: '',
-    sm: 'py-8 px-4',
-    md: 'py-12 px-4',
-    lg: 'py-20 px-4',
-    xl: 'py-24 px-4',
+    sm: 'py-6 sm:py-8',
+    md: 'py-8 sm:py-10 lg:py-12',
+    lg: 'py-12 sm:py-16 lg:py-20',
+    xl: 'py-16 sm:py-20 lg:py-24',
   }
 
   const backgroundClasses = {

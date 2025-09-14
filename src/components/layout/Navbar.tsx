@@ -2,8 +2,9 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useSwipeGestures } from '@/hooks/useTouchGestures'
 import EmergencyMedicalProfileModal from '../ui/EmergencyMedicalProfileModal'
 
 export function Navbar() {
@@ -24,59 +25,100 @@ export function Navbar() {
     setIsModalOpen(false)
   }
 
+  // Add swipe gesture support for mobile menu
+  const swipeHandlers = useSwipeGestures({
+    onSwipeRight: () => {
+      if (!isMenuOpen) {
+        setIsMenuOpen(true)
+      }
+    },
+    onSwipeLeft: () => {
+      if (isMenuOpen) {
+        setIsMenuOpen(false)
+      }
+    },
+  })
+
+  // Close menu when route changes (for mobile)
+  useEffect(() => {
+    const handleRouteChange = () => {
+      setIsMenuOpen(false)
+    }
+
+    // Listen for route changes
+    window.addEventListener('popstate', handleRouteChange)
+    
+    return () => {
+      window.removeEventListener('popstate', handleRouteChange)
+    }
+  }, [])
+
   return (
-    <nav className="bg-white/95 backdrop-blur-md shadow-lg sticky top-0 z-50 border-b border-gray-200">
-      <div className="max-w-7xl mx-auto px-4">
-        <div className="flex items-center justify-between h-20">
+    <nav 
+      className="bg-white/95 backdrop-blur-md shadow-lg sticky top-0 z-50 border-b border-gray-200"
+      {...swipeHandlers}
+    >
+      <div className="max-w-7xl mx-auto px-[15px] sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16 sm:h-18 lg:h-20">
           {/* Logo */}
           <div className="flex-shrink-0">
             <Link href="/" className="flex items-center">
+              {/* Mobile Logo - smaller and optimized for mobile screens */}
+              <Image
+                src="/images/ICETracer-Logo-Mobile.png"
+                alt="ICE Tracer Logo"
+                width={140}
+                height={40}
+                priority
+                className="h-6 w-auto sm:hidden"
+              />
+              {/* Desktop/Tablet Logo - larger for bigger screens */}
               <Image
                 src="/images/ICE-Tracer-Logo.png"
                 alt="ICE Tracer Logo"
                 width={200}
                 height={60}
                 priority
-                className="h-12 w-auto"
+                className="hidden sm:block h-10 lg:h-12 w-auto"
               />
             </Link>
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden md:flex items-center space-x-4 lg:space-x-6 xl:space-x-8">
             <Link 
               href="/about" 
-              className="text-gray-700 hover:text-[#245789] px-3 py-2 text-sm font-medium transition-colors"
+              className="text-gray-700 hover:text-[#245789] px-2 lg:px-3 py-2 text-sm font-medium transition-colors"
             >
               About
             </Link>
             <Link 
               href="/blog" 
-              className="text-gray-700 hover:text-[#245789] px-3 py-2 text-sm font-medium transition-colors"
+              className="text-gray-700 hover:text-[#245789] px-2 lg:px-3 py-2 text-sm font-medium transition-colors"
             >
               Blog
             </Link>
             <Link 
               href="#features" 
-              className="text-gray-700 hover:text-[#245789] px-3 py-2 text-sm font-medium transition-colors"
+              className="text-gray-700 hover:text-[#245789] px-2 lg:px-3 py-2 text-sm font-medium transition-colors"
             >
               Features
             </Link>
             <Link 
               href="#plans" 
-              className="text-gray-700 hover:text-[#245789] px-3 py-2 text-sm font-medium transition-colors"
+              className="text-gray-700 hover:text-[#245789] px-2 lg:px-3 py-2 text-sm font-medium transition-colors"
             >
               Plans
             </Link>
             <Link 
               href="/faq" 
-              className="text-gray-700 hover:text-[#245789] px-3 py-2 text-sm font-medium transition-colors"
+              className="text-gray-700 hover:text-[#245789] px-2 lg:px-3 py-2 text-sm font-medium transition-colors"
             >
               FAQ
             </Link>
             <button 
               onClick={openModal}
-              className="bg-[#CA0015] hover:bg-red-700 text-white px-6 py-2 rounded-lg font-medium transition-colors shadow-md hover:shadow-lg"
+              className="bg-[#CA0015] hover:bg-red-700 text-white px-4 lg:px-6 py-2 rounded-lg font-medium transition-colors shadow-md hover:shadow-lg text-sm whitespace-nowrap"
             >
               ACCESS MEDICAL PROFILE
             </button>
@@ -115,9 +157,9 @@ export function Navbar() {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.2 }}
+              transition={{ duration: 0.3, ease: 'easeInOut' }}
             >
-              <div className="px-2 pt-2 pb-3 space-y-1 border-t border-gray-200 bg-white">
+              <div className="px-2 pt-2 pb-3 space-y-1 border-t border-gray-200 bg-white backdrop-blur-md shadow-lg">
                 <motion.div
                   initial={{ x: -20, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
@@ -190,7 +232,7 @@ export function Navbar() {
                 >
                   <button 
                     onClick={openModal}
-                    className="block bg-[#CA0015] hover:bg-red-700 text-white px-3 py-2 rounded-md text-base font-medium transition-colors text-center mt-4 shadow-md w-full"
+                    className="block bg-[#CA0015] hover:bg-red-700 text-white px-3 py-2 rounded-md text-base font-medium transition-colors text-center mt-2 shadow-md w-full"
                   >
                     ACCESS MEDICAL PROFILE
                   </button>
