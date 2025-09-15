@@ -30,7 +30,7 @@ http://localhost:3000/api/auth/callback/google
 
 **For Production (replace with your domain):**
 ```
-https://your-domain.vercel.app/api/auth/callback/google
+https://icetracer.com/api/auth/callback/google
 ```
 
 ### Step 5: Configure Authorized Origins
@@ -43,7 +43,7 @@ http://localhost:3000
 
 **Production:**
 ```
-https://your-domain.vercel.app
+https://icetracer.com
 ```
 
 ### Step 6: Save and Copy Credentials

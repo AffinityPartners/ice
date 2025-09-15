@@ -61,7 +61,7 @@ ADMIN_EMAILS="your-email@example.com" # Comma-separated list of admin emails
 4. Create OAuth 2.0 credentials
 5. Add authorized redirect URIs:
    - `http://localhost:3000/api/auth/callback/google`
-   - `https://yourdomain.com/api/auth/callback/google` (for production)
+   - `https://icetracer.com/api/auth/callback/google` (for production)
 6. Copy Client ID and Client Secret to `.env.local`
 
 ### Option B: Email/Password

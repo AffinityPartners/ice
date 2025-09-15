@@ -25,7 +25,7 @@
 - [ ] Create new OAuth2 client
 - [ ] Set callback URLs:
   - `http://localhost:3000/api/auth/callback/google`
-  - `https://your-domain.com/api/auth/callback/google`
+  - `https://icetracer.com/api/auth/callback/google`
 - [ ] Copy new GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET
 
 ---
