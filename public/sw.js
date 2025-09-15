@@ -94,6 +94,11 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // Skip redirect pages that should go to external application
+  if (url.pathname === '/member-login' || url.pathname === '/choose-plan') {
+    return;
+  }
+
   // Handle different types of requests
   if (url.pathname.startsWith('/api/')) {
     // API requests - network first with cache fallback
