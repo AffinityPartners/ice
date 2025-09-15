@@ -101,7 +101,7 @@ export function Footer() {
         <div className="border-t border-gray-300 pt-6 sm:pt-8">
           <div className="flex flex-col sm:flex-row lg:flex-row justify-between items-center gap-4 text-center sm:text-left">
             <p className="text-[#484848] text-xs sm:text-sm order-2 sm:order-1">
-              Copyright © ICE Tracer 2024 – All Rights Reserved
+              Copyright © ICE Tracer 2025 – All Rights Reserved
             </p>
             <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 lg:space-x-6 order-1 sm:order-2">
               <Link href="/privacy-policy" className="text-[#484848] hover:text-[#245789] transition-colors text-xs sm:text-sm">Privacy Policy</Link>
