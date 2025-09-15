@@ -33,7 +33,7 @@ export function TopBar() {
         {/* Right side - Auth Links */}
         <div className="flex items-center space-x-3 sm:space-x-4">
           <Link 
-            href="/auth/signin" 
+            href="/member-login" 
             className="flex items-center space-x-1 hover:text-gray-200 transition-colors min-h-[44px] py-2 px-1"
           >
             <FaUser className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
