@@ -29,7 +29,7 @@ const EmergencyMedicalProfileModal: React.FC<EmergencyMedicalProfileModalProps> 
   const [deviceId, setDeviceId] = useState('');
   const [pin, setPin] = useState('');
 
-  console.log('Modal isOpen:', isOpen);
+  // Modal state management
 
   const handleAccessProfile = (e: React.FormEvent) => {
     e.preventDefault();

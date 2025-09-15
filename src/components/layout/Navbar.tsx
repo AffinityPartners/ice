@@ -16,7 +16,6 @@ export function Navbar() {
   }
 
   const openModal = () => {
-    console.log('Opening modal...')
     setIsModalOpen(true)
     setIsMenuOpen(false) // Close mobile menu if open
   }

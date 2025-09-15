@@ -11,18 +11,15 @@
  * mobile experience on slow or unreliable connections.
  */
 
-const CACHE_NAME = 'ice-tracer-v1';
-const STATIC_CACHE = 'ice-tracer-static-v1';
-const DYNAMIC_CACHE = 'ice-tracer-dynamic-v1';
+const CACHE_NAME = 'ice-tracer-v2';
+const STATIC_CACHE = 'ice-tracer-static-v2';
+const DYNAMIC_CACHE = 'ice-tracer-dynamic-v2';
 
 // Critical assets to cache immediately
 const STATIC_ASSETS = [
   '/',
   '/about',
   '/faq',
-  '/offline',
-  '/_next/static/css/',
-  '/_next/static/chunks/',
   '/images/ICE-Tracer-Logo.png',
   '/images/ICE-Profile-Image-2024-HQ.png',
   '/favicon.ico',
