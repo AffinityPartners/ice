@@ -81,11 +81,11 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6 }}
           >
-            <Link href="/choose-plan">
+            <a href="https://www.icetracer.com/choose-plan">
               <Button size="lg" className="text-lg sm:text-xl lg:text-2xl px-8 sm:px-10 lg:px-12 py-4 sm:py-5 lg:py-6 min-h-[48px] sm:min-h-[52px]">
                 SIGN UP TODAY
               </Button>
-            </Link>
+            </a>
           </motion.div>
         </motion.div>
       </section>
@@ -286,11 +286,11 @@ export default function Home() {
               </div>
 
               <div className="flex justify-center lg:justify-start">
-                <Link href="/choose-plan">
+                <a href="https://www.icetracer.com/choose-plan">
                   <Button size="lg" className="px-10">
                     COMPARE PLANS
                   </Button>
-                </Link>
+                </a>
               </div>
             </div>
           </div>
@@ -611,14 +611,14 @@ export default function Home() {
                   </div>
                 </div>
                 
-                <Link href="/choose-plan">
+                <a href="https://www.icetracer.com/choose-plan">
                   <Button 
                     className="w-full bg-gradient-to-r from-[#245789] to-[#2d6aa0] hover:from-[#CA0015] hover:to-[#b8000f] text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105" 
                     size="lg"
                   >
                     GET STARTED
                   </Button>
-                </Link>
+                </a>
               </div>
             </motion.div>
 
@@ -671,14 +671,14 @@ export default function Home() {
                   </div>
                 </div>
                 
-                <Link href="/choose-plan">
+                <a href="https://www.icetracer.com/choose-plan">
                   <Button 
                     className="w-full bg-gradient-to-r from-[#CA0015] to-[#b8000f] hover:from-white hover:to-gray-100 hover:text-[#245789] text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105" 
                     size="lg"
                   >
                     GET STARTED
                   </Button>
-                </Link>
+                </a>
               </div>
             </motion.div>
           </div>
@@ -804,11 +804,11 @@ export default function Home() {
             </p>
           </div>
           <div className="flex-shrink-0">
-            <Link href="/choose-plan">
+            <a href="https://www.icetracer.com/choose-plan">
               <Button variant="outline" size="lg" className="bg-white text-[#245789] hover:bg-gray-100 border-white text-lg sm:text-xl px-8 sm:px-12 min-h-[48px] sm:min-h-[52px]">
                 SIGN UP TODAY
               </Button>
-            </Link>
+            </a>
           </div>
         </div>
       </Section>

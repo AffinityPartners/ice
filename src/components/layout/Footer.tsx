@@ -38,12 +38,12 @@ export function Footer() {
             <h3 className="text-xl sm:text-2xl font-bold text-[#484848] mb-4 sm:mb-6 leading-tight">
               Don&apos;t Leave Your Medical Care to Chance
             </h3>
-            <Link 
-              href="/choose-plan" 
+            <a 
+              href="https://www.icetracer.com/choose-plan" 
               className="inline-block bg-[#245789] text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg font-bold hover:bg-[#1e4a75] transition-colors mb-4 sm:mb-6 shadow-md hover:shadow-lg text-sm sm:text-base"
             >
               REGISTER NOW
-            </Link>
+            </a>
             
             {/* Social Media Icons */}
             <div className="flex justify-center md:justify-start space-x-3 sm:space-x-4">
