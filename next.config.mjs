@@ -86,6 +86,22 @@ const nextConfig = {
       },
     ];
   },
+
+  // Redirects for external application pages
+  async redirects() {
+    return [
+      {
+        source: '/member-login',
+        destination: 'https://www.icetracer.com/member-login',
+        permanent: true,
+      },
+      {
+        source: '/choose-plan',
+        destination: 'https://www.icetracer.com/choose-plan',
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;
