@@ -81,7 +81,7 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6 }}
           >
-            <a href="https://www.icetracer.com/choose-plan">
+            <a href="https://user.icetracer.com/plans">
               <Button size="lg" className="text-lg sm:text-xl lg:text-2xl px-8 sm:px-10 lg:px-12 py-4 sm:py-5 lg:py-6 min-h-[48px] sm:min-h-[52px]">
                 SIGN UP TODAY
               </Button>
@@ -286,7 +286,7 @@ export default function Home() {
               </div>
 
               <div className="flex justify-center lg:justify-start">
-                <a href="https://www.icetracer.com/choose-plan">
+                <a href="https://user.icetracer.com/plans">
                   <Button size="lg" className="px-10">
                     COMPARE PLANS
                   </Button>
@@ -611,7 +611,7 @@ export default function Home() {
                   </div>
                 </div>
                 
-                <a href="https://www.icetracer.com/choose-plan">
+                <a href="https://user.icetracer.com/plans">
                   <Button 
                     className="w-full bg-gradient-to-r from-[#245789] to-[#2d6aa0] hover:from-[#CA0015] hover:to-[#b8000f] text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105" 
                     size="lg"
@@ -637,7 +637,7 @@ export default function Home() {
                   </div>
                   <h3 className="text-3xl font-bold text-white mb-2">Silver</h3>
                   <div className="flex items-center justify-center mb-2">
-                    <span className="text-4xl font-bold text-white">$11.99</span>
+                    <span className="text-4xl font-bold text-white">$14.99</span>
                     <span className="text-white/80 ml-2">/month</span>
                   </div>
                                      <p className="text-white font-medium bg-white/20 backdrop-blur-sm py-2 px-4 rounded-lg">
@@ -671,7 +671,7 @@ export default function Home() {
                   </div>
                 </div>
                 
-                <a href="https://www.icetracer.com/choose-plan">
+                <a href="https://user.icetracer.com/plans">
                   <Button 
                     className="w-full bg-gradient-to-r from-[#CA0015] to-[#b8000f] hover:from-white hover:to-gray-100 hover:text-[#245789] text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105" 
                     size="lg"
@@ -804,7 +804,7 @@ export default function Home() {
             </p>
           </div>
           <div className="flex-shrink-0">
-            <a href="https://www.icetracer.com/choose-plan">
+            <a href="https://user.icetracer.com/plans">
               <Button variant="outline" size="lg" className="bg-white text-[#245789] hover:bg-gray-100 border-white text-lg sm:text-xl px-8 sm:px-12 min-h-[48px] sm:min-h-[52px]">
                 SIGN UP TODAY
               </Button>

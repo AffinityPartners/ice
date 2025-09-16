@@ -33,14 +33,14 @@ export function TopBar() {
         {/* Right side - Auth Links */}
         <div className="flex items-center space-x-3 sm:space-x-4">
           <a 
-            href="https://www.icetracer.com/member-login" 
+            href="https://user.icetracer.com/login" 
             className="flex items-center space-x-1 hover:text-gray-200 transition-colors min-h-[44px] py-2 px-1"
           >
             <FaUser className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
             <span className="sm:inline">Log In</span>
           </a>
           <a 
-            href="https://www.icetracer.com/choose-plan" 
+            href="https://user.icetracer.com/plans" 
             className="flex items-center space-x-1 bg-[#CA0015] hover:bg-red-700 min-h-[44px] px-3 py-2 sm:px-4 sm:py-2 rounded text-white transition-colors text-xs sm:text-sm font-medium touch-manipulation"
           >
             <FaUserPlus className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />

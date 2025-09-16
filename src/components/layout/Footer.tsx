@@ -39,7 +39,7 @@ export function Footer() {
               Don&apos;t Leave Your Medical Care to Chance
             </h3>
             <a 
-              href="https://www.icetracer.com/choose-plan" 
+              href="https://user.icetracer.com/plans" 
               className="inline-block bg-[#245789] text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg font-bold hover:bg-[#1e4a75] transition-colors mb-4 sm:mb-6 shadow-md hover:shadow-lg text-sm sm:text-base"
             >
               REGISTER NOW

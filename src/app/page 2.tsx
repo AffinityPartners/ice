@@ -215,7 +215,7 @@ export default function HomePage() {
     },
     {
       name: "Silver", 
-      price: 11.99,
+      price: 14.99,
       profiles: 10,
       features: [
         "Everything in Bronze",

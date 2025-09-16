@@ -92,7 +92,7 @@ self.addEventListener('fetch', (event) => {
   }
 
   // Skip redirect pages that should go to external application
-  if (url.pathname === '/member-login' || url.pathname === '/choose-plan') {
+  if (url.pathname === '/login' || url.pathname === '/plans') {
     return;
   }
 
