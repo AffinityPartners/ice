@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Lato } from "next/font/google";
 import "./globals.css";
+import { Analytics } from "@vercel/analytics/next";
 import { ConditionalHeader } from "@/components/layout/ConditionalHeader";
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { SessionProvider } from "@/components/providers/SessionProvider";
@@ -92,6 +93,8 @@ export default function RootLayout({
             </ErrorBoundary>
           </OfflineProvider>
         </SessionProvider>
+        {/* Vercel Analytics - tracks page views and visitor metrics */}
+        <Analytics />
       </body>
     </html>
   );
