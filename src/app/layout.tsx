@@ -24,9 +24,17 @@ export const metadata: Metadata = {
   description: "ICE Tracer provides instant access to critical medical information during emergencies. Store and share your medical profile with first responders and healthcare providers.",
   keywords: "emergency medical information, ICE, medical profile, first responders, healthcare, emergency contacts, medical ID, emergency response",
   icons: {
-    icon: '/images/Favicon-512x512-copy.png',
-    shortcut: '/images/Favicon-512x512-copy.png',
-    apple: '/images/Favicon-512x512-copy.png',
+    icon: [
+      { url: '/favicon.ico', sizes: '32x32' },
+      { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+    ],
+    apple: [
+      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
+    ],
+    other: [
+      { rel: 'manifest', url: '/site.webmanifest' },
+    ],
   },
   openGraph: {
     type: 'website',
