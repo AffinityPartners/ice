@@ -1,8 +1,23 @@
+/**
+ * Affiliate Stats API Route
+ * 
+ * Retrieves statistics for the current affiliate including:
+ * - Total and monthly earnings
+ * - Conversion rates
+ * - Referral counts
+ * - Pending commissions
+ */
+
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
+import { eq } from 'drizzle-orm';
 import { authOptions } from '@/lib/auth-options';
-import { prisma } from '@/lib/prisma';
+import { db, users, referrals, commissionLogs } from '@/db';
 
+/**
+ * GET /api/affiliate/stats
+ * Calculates and returns comprehensive affiliate statistics.
+ */
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);
@@ -12,50 +27,50 @@ export async function GET() {
     }
 
     // Get user and their affiliate profile
-    const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
-      include: { affiliate: true }
+    const user = await db.query.users.findFirst({
+      where: eq(users.email, session.user.email),
+      with: { affiliate: true }
     });
 
     if (!user?.affiliate) {
       return NextResponse.json({ error: 'Not an affiliate' }, { status: 403 });
     }
 
-    // Get affiliate stats
-    const [referrals, commissions] = await Promise.all([
+    // Get affiliate stats using parallel queries
+    const [allReferrals, commissions] = await Promise.all([
       // Get all referrals
-      prisma.referral.findMany({
-        where: { affiliateId: user.affiliate.id }
+      db.query.referrals.findMany({
+        where: eq(referrals.affiliateId, user.affiliate.id)
       }),
       // Get commission logs
-      prisma.commission_log.findMany({
-        where: { affiliate_id: user.affiliate.id }
+      db.query.commissionLogs.findMany({
+        where: eq(commissionLogs.affiliateId, user.affiliate.id)
       })
     ]);
 
     // Calculate stats
-    const totalReferrals = referrals.length;
-    const convertedReferrals = referrals.filter(r => r.status === 'CONVERTED').length;
+    const totalReferrals = allReferrals.length;
+    const convertedReferrals = allReferrals.filter(r => r.status === 'CONVERTED').length;
     const conversionRate = totalReferrals > 0 
       ? ((convertedReferrals / totalReferrals) * 100).toFixed(1)
       : '0';
 
-    const totalEarnings = commissions.reduce((sum, c) => sum + (c.amount_cents || 0), 0) / 100;
+    const totalEarnings = commissions.reduce((sum, c) => sum + (c.amountCents || 0), 0) / 100;
     const unpaidCommissions = commissions
-      .filter(c => !c.is_paid)
-      .reduce((sum, c) => sum + (c.amount_cents || 0), 0) / 100;
+      .filter(c => !c.isPaid)
+      .reduce((sum, c) => sum + (c.amountCents || 0), 0) / 100;
 
     // Calculate monthly earnings (last 30 days)
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
     
     const monthlyCommissions = commissions.filter(c => 
-      c.created_at && c.created_at > thirtyDaysAgo
+      c.createdAt && c.createdAt > thirtyDaysAgo
     );
     const monthlyEarnings = monthlyCommissions
-      .reduce((sum, c) => sum + (c.amount_cents || 0), 0) / 100;
+      .reduce((sum, c) => sum + (c.amountCents || 0), 0) / 100;
 
-    const averageCommission = totalReferrals > 0
+    const averageCommission = convertedReferrals > 0
       ? totalEarnings / convertedReferrals
       : 0;
 

@@ -45,13 +45,17 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 
+/**
+ * Activity log entry with optional actor information.
+ * Actor may be null if the user was deleted.
+ */
 interface ActivityLog {
   id: string;
   actorId: string;
   actorRole: string;
   action: string;
-  target?: any;
-  metadata?: any;
+  target?: string | null;
+  metadata?: unknown;
   ipAddress?: string | null;
   userAgent?: string | null;
   createdAt: Date;
@@ -59,7 +63,7 @@ interface ActivityLog {
     name: string | null;
     email: string | null;
     image: string | null;
-  };
+  } | null;
 }
 
 interface ActivityTableProps {
@@ -161,8 +165,8 @@ export default function ActivityTable({ initialLogs }: ActivityTableProps) {
   // Filter logs based on search and filters
   const filteredLogs = logs.filter(log => {
     const matchesSearch = searchTerm === '' || 
-      log.actor.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      log.actor.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      log.actor?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      log.actor?.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       log.action.toLowerCase().includes(searchTerm.toLowerCase());
 
     const matchesRole = roleFilter === 'all' || log.actorRole === roleFilter;
@@ -298,18 +302,18 @@ export default function ActivityTable({ initialLogs }: ActivityTableProps) {
                       <TableCell>
                         <div className="flex items-center gap-3">
                           <Avatar className="h-8 w-8">
-                            <AvatarImage src={log.actor.image || undefined} />
+                            <AvatarImage src={log.actor?.image || undefined} />
                             <AvatarFallback>
-                              {log.actor.name?.charAt(0).toUpperCase() || 
-                               log.actor.email?.charAt(0).toUpperCase() || '?'}
+                              {log.actor?.name?.charAt(0).toUpperCase() || 
+                               log.actor?.email?.charAt(0).toUpperCase() || '?'}
                             </AvatarFallback>
                           </Avatar>
                           <div>
                             <p className="font-medium text-sm">
-                              {log.actor.name || 'Unknown User'}
+                              {log.actor?.name || 'Unknown User'}
                             </p>
                             <p className="text-xs text-muted-foreground">
-                              {log.actor.email}
+                              {log.actor?.email || 'No email'}
                             </p>
                           </div>
                         </div>
@@ -389,20 +393,20 @@ export default function ActivityTable({ initialLogs }: ActivityTableProps) {
                                 </div>
 
                                 {/* Target Details */}
-                                {log.target && (
+                                {log.target != null && (
                                   <div>
                                     <h4 className="text-sm font-medium mb-2 flex items-center gap-2">
                                       <Info className="h-4 w-4 text-muted-foreground" />
                                       Target Details
                                     </h4>
                                     <pre className="text-xs bg-background p-3 rounded-lg overflow-x-auto">
-                                      {JSON.stringify(log.target, null, 2)}
+                                      {String(log.target)}
                                     </pre>
                                   </div>
                                 )}
 
                                 {/* Metadata */}
-                                {log.metadata && (
+                                {log.metadata != null && (
                                   <div>
                                     <h4 className="text-sm font-medium mb-2 flex items-center gap-2">
                                       <Info className="h-4 w-4 text-muted-foreground" />

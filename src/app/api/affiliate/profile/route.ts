@@ -1,8 +1,22 @@
+/**
+ * Affiliate Profile API Route
+ * 
+ * Handles affiliate profile operations.
+ * GET: Retrieve the current user's affiliate profile
+ * PUT: Update the current user's affiliate profile
+ */
+
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
+import { eq } from 'drizzle-orm';
 import { authOptions } from '@/lib/auth-options';
-import { prisma } from '@/lib/prisma';
+import { db, users, affiliates } from '@/db';
 
+/**
+ * GET /api/affiliate/profile
+ * Retrieves the current user's affiliate profile.
+ * Returns 403 if the user is not an affiliate.
+ */
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);
@@ -11,9 +25,10 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
-      include: { affiliate: true }
+    // Get user with affiliate profile
+    const user = await db.query.users.findFirst({
+      where: eq(users.email, session.user.email),
+      with: { affiliate: true }
     });
 
     if (!user?.affiliate) {
@@ -30,6 +45,11 @@ export async function GET() {
   }
 }
 
+/**
+ * PUT /api/affiliate/profile
+ * Updates the current user's affiliate profile.
+ * Also updates user's first and last name if provided.
+ */
 export async function PUT(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
@@ -38,9 +58,10 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
-      include: { affiliate: true }
+    // Get user with affiliate profile
+    const user = await db.query.users.findFirst({
+      where: eq(users.email, session.user.email),
+      with: { affiliate: true }
     });
 
     if (!user?.affiliate) {
@@ -50,9 +71,8 @@ export async function PUT(request: NextRequest) {
     const body = await request.json();
     
     // Update affiliate profile
-    const updatedAffiliate = await prisma.affiliate.update({
-      where: { id: user.affiliate.id },
-      data: {
+    const [updatedAffiliate] = await db.update(affiliates)
+      .set({
         companyName: body.companyName,
         firstName: body.firstName,
         lastName: body.lastName,
@@ -66,18 +86,18 @@ export async function PUT(request: NextRequest) {
         heroSubtext: body.heroSubtext,
         ctaText: body.ctaText,
         ctaButtonLink: body.ctaButtonLink,
-      }
-    });
+      })
+      .where(eq(affiliates.id, user.affiliate.id))
+      .returning();
 
     // Also update user's first and last name
     if (body.firstName || body.lastName) {
-      await prisma.user.update({
-        where: { id: user.id },
-        data: {
+      await db.update(users)
+        .set({
           firstName: body.firstName,
           lastName: body.lastName,
-        }
-      });
+        })
+        .where(eq(users.id, user.id));
     }
 
     return NextResponse.json(updatedAffiliate);

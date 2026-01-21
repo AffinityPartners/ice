@@ -1,29 +1,43 @@
-import { prisma } from '@/lib/prisma';
+/**
+ * Admin Settings Page
+ * 
+ * Provides interface for managing global application settings.
+ * Settings control site-wide defaults for hero content, colors, and banners.
+ */
+
+import { db, globalConfig } from '@/db';
 import GlobalSettingsForm from './GlobalSettingsForm';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Settings } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
+/**
+ * Retrieves the global configuration, creating default values if none exist.
+ */
 async function getGlobalConfig() {
-  let config = await prisma.globalConfig.findFirst();
+  let config = await db.query.globalConfig.findFirst();
   
   // Create default config if it doesn't exist
   if (!config) {
-    config = await prisma.globalConfig.create({
-      data: {
-        defaultHeroHeading: "Your Emergency Information When It Matters Most",
-        defaultHeroSubtext: "Secure, instant access to critical medical and contact information",
-        defaultCtaText: "Get ICE Tracer Today",
-        defaultPrimaryColor: "#245789",
-        bannerActive: false,
-      },
-    });
+    const [newConfig] = await db.insert(globalConfig).values({
+      defaultHeroHeading: "Your Emergency Information When It Matters Most",
+      defaultHeroSubtext: "Secure, instant access to critical medical and contact information",
+      defaultCtaText: "Get ICE Tracer Today",
+      defaultPrimaryColor: "#245789",
+      bannerActive: false,
+    }).returning();
+    
+    config = newConfig;
   }
   
   return config;
 }
 
+/**
+ * Main admin settings page component.
+ * Displays the global settings form.
+ */
 export default async function GlobalSettingsPage() {
   const config = await getGlobalConfig();
 

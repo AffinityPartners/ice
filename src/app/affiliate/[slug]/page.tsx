@@ -1,5 +1,16 @@
+/**
+ * Affiliate Landing Page
+ * 
+ * Dynamic landing page for affiliate partners.
+ * Displays customized branding, hero content, and call-to-action
+ * based on the affiliate's profile settings.
+ * 
+ * Tracks page visits for affiliate analytics.
+ */
+
 import { notFound } from 'next/navigation';
-import { prisma } from '@/lib/prisma';
+import { eq, and } from 'drizzle-orm';
+import { db, affiliates } from '@/db';
 import Link from 'next/link';
 import Image from 'next/image';
 import { FaShieldAlt, FaAmbulance, FaUserMd, FaIdCard } from 'react-icons/fa';
@@ -10,20 +21,21 @@ interface Props {
   }>;
 }
 
+/**
+ * Renders a customized landing page for an affiliate.
+ * Increments visit count for analytics tracking.
+ */
 export default async function AffiliateLandingPage({ params }: Props) {
   const resolvedParams = await params;
-  const affiliate = await prisma.affiliate.findUnique({
-    where: { 
-      slug: resolvedParams.slug,
-      isActive: true,
-    },
-    include: {
-      user: {
-        select: {
-          name: true,
-          email: true,
-        }
-      }
+  
+  // Find active affiliate by slug
+  const affiliate = await db.query.affiliates.findFirst({
+    where: and(
+      eq(affiliates.slug, resolvedParams.slug),
+      eq(affiliates.isActive, true)
+    ),
+    with: {
+      user: true
     }
   });
 
@@ -31,11 +43,10 @@ export default async function AffiliateLandingPage({ params }: Props) {
     notFound();
   }
 
-  // Track visit
-  await prisma.affiliate.update({
-    where: { id: affiliate.id },
-    data: { visits: { increment: 1 } }
-  });
+  // Track visit by incrementing visits counter
+  await db.update(affiliates)
+    .set({ visits: affiliate.visits + 1 })
+    .where(eq(affiliates.id, affiliate.id));
 
   const primaryColor = affiliate.primaryColor || '#245789';
 

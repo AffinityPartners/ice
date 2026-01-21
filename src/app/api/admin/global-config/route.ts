@@ -1,25 +1,36 @@
-import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+/**
+ * Global Config API Route
+ * 
+ * Retrieves the global configuration for the application.
+ * Creates a default configuration if none exists.
+ */
 
+import { NextResponse } from 'next/server';
+import { db, globalConfig } from '@/db';
+
+/**
+ * GET /api/admin/global-config
+ * Retrieves the global configuration, creating default values if needed.
+ */
 export async function GET() {
   try {
-    // Get existing config or create default one
-    let globalConfig = await prisma.globalConfig.findFirst();
+    // Get existing config
+    let config = await db.query.globalConfig.findFirst();
 
-    if (!globalConfig) {
+    if (!config) {
       // Create default config if none exists
-      globalConfig = await prisma.globalConfig.create({
-        data: {
-          defaultHeroHeading: 'Your Emergency Information When It Matters Most',
-          defaultHeroSubtext: 'Secure, instant access to critical medical and contact information',
-          defaultCtaText: 'Get Started Today',
-          defaultPrimaryColor: '#3b82f6',
-          bannerActive: false,
-        },
-      });
+      const [newConfig] = await db.insert(globalConfig).values({
+        defaultHeroHeading: 'Your Emergency Information When It Matters Most',
+        defaultHeroSubtext: 'Secure, instant access to critical medical and contact information',
+        defaultCtaText: 'Get Started Today',
+        defaultPrimaryColor: '#3b82f6',
+        bannerActive: false,
+      }).returning();
+      
+      config = newConfig;
     }
 
-    return NextResponse.json(globalConfig);
+    return NextResponse.json(config);
   } catch (error) {
     console.error('Error fetching global config:', error);
     return NextResponse.json(

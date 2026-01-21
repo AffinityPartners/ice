@@ -1,4 +1,12 @@
-import { prisma } from '@/lib/prisma';
+/**
+ * Edit Blog Post Page
+ * 
+ * Server component that fetches a blog post by ID and renders the edit form.
+ * Redirects to 404 if the post is not found.
+ */
+
+import { eq } from 'drizzle-orm';
+import { db, posts } from '@/db';
 import BlogPostForm from '@/components/admin/blog/BlogPostForm';
 import { notFound } from 'next/navigation';
 
@@ -8,17 +16,24 @@ interface Props {
   }>;
 }
 
+/**
+ * Renders the blog post edit page.
+ * Fetches the post data server-side and passes it to the form component.
+ */
 export default async function EditBlogPostPage({ params }: Props) {
   const resolvedParams = await params;
-  const post = await prisma.post.findUnique({
-    where: { id: resolvedParams.id },
-    include: { category: true },
+  
+  // Fetch the post with its category using Drizzle
+  const post = await db.query.posts.findFirst({
+    where: eq(posts.id, resolvedParams.id),
+    with: { category: true },
   });
 
   if (!post) {
     notFound();
   }
 
+  // Transform post data into form-compatible format
   const initialData = {
     title: post.title,
     slug: post.slug,

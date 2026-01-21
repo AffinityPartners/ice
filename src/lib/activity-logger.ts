@@ -1,6 +1,20 @@
-import { prisma } from './prisma';
-import { Role } from '@prisma/client';
+/**
+ * Activity Logger
+ * 
+ * Provides comprehensive activity logging for audit trails throughout the application.
+ * Tracks user actions including authentication, content management, affiliate operations,
+ * and system changes with IP and user agent information.
+ * 
+ * The logger is designed to be non-blocking - if logging fails, it logs the error
+ * but doesn't prevent the main operation from completing.
+ */
 
+import { db, activityLogs, type Role } from '@/db';
+
+/**
+ * All possible activity actions tracked by the system.
+ * Organized by feature area for clarity.
+ */
 export type ActivityAction =
   // Blog actions
   | 'created_blog_post'
@@ -52,15 +66,24 @@ export type ActivityAction =
   | 'stripe_onboarding_started'
   | 'stripe_onboarding_completed';
 
+/**
+ * Parameters for logging an activity.
+ */
 interface LogActivityParams {
   actorId: string;
   actorRole: Role;
   action: ActivityAction;
-  target?: any;
-  metadata?: Record<string, any>;
+  target?: string;
+  metadata?: Record<string, unknown>;
   req?: Request;
 }
 
+/**
+ * Core function to log an activity to the database.
+ * Extracts IP address and user agent from request headers if provided.
+ * 
+ * @param params - The activity parameters to log
+ */
 export async function logActivity({
   actorId,
   actorRole,
@@ -73,30 +96,33 @@ export async function logActivity({
     let ipAddress: string | undefined;
     let userAgent: string | undefined;
 
+    // Extract request metadata if available
     if (req) {
-      // Get IP address from headers
+      // Get IP address from headers (handles proxies/load balancers)
       ipAddress = req.headers.get('x-forwarded-for')?.split(',')[0] ||
                   req.headers.get('x-real-ip') ||
                   undefined;
       userAgent = req.headers.get('user-agent') || undefined;
     }
 
-    await prisma.activityLog.create({
-      data: {
-        actorId,
-        actorRole,
-        action,
-        target,
-        metadata,
-        ipAddress,
-        userAgent
-      }
+    // Insert activity log using Drizzle
+    await db.insert(activityLogs).values({
+      actorId,
+      actorRole,
+      action,
+      target: target ? (typeof target === 'object' ? JSON.stringify(target) : target) : null,
+      metadata: metadata || null,
+      ipAddress: ipAddress || null,
+      userAgent: userAgent || null,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     // Log to console but don't throw - we don't want logging failures to break the app
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const errorCode = (error as { code?: string })?.code;
+    
     console.error('Failed to log activity:', {
-      error: error.message,
-      code: error.code,
+      error: errorMessage,
+      code: errorCode,
       actorId,
       actorRole,
       action,
@@ -110,41 +136,109 @@ export async function logActivity({
   }
 }
 
-// Convenience functions for common actions
+/**
+ * Convenience functions for common activity logging patterns.
+ * Organized by feature area for easy discovery and use.
+ */
 export const ActivityLogger = {
+  /**
+   * Blog post activity logging
+   */
   blogPost: {
     created: (userId: string, role: Role, postTitle: string, postId: string) =>
-      logActivity({ actorId: userId, actorRole: role, action: 'created_blog_post', target: { title: postTitle }, metadata: { postId } }),
+      logActivity({ 
+        actorId: userId, 
+        actorRole: role, 
+        action: 'created_blog_post', 
+        target: JSON.stringify({ title: postTitle }), 
+        metadata: { postId } 
+      }),
 
-    updated: (userId: string, role: Role, postTitle: string, postId: string, changes?: any) =>
-      logActivity({ actorId: userId, actorRole: role, action: 'updated_blog_post', target: { title: postTitle }, metadata: { postId, changes } }),
+    updated: (userId: string, role: Role, postTitle: string, postId: string, changes?: Record<string, unknown>) =>
+      logActivity({ 
+        actorId: userId, 
+        actorRole: role, 
+        action: 'updated_blog_post', 
+        target: JSON.stringify({ title: postTitle }), 
+        metadata: { postId, changes } 
+      }),
 
     published: (userId: string, role: Role, postTitle: string, postId: string) =>
-      logActivity({ actorId: userId, actorRole: role, action: 'published_blog_post', target: { title: postTitle }, metadata: { postId } }),
+      logActivity({ 
+        actorId: userId, 
+        actorRole: role, 
+        action: 'published_blog_post', 
+        target: JSON.stringify({ title: postTitle }), 
+        metadata: { postId } 
+      }),
 
     unpublished: (userId: string, role: Role, postTitle: string, postId: string) =>
-      logActivity({ actorId: userId, actorRole: role, action: 'unpublished_blog_post', target: { title: postTitle }, metadata: { postId } }),
+      logActivity({ 
+        actorId: userId, 
+        actorRole: role, 
+        action: 'unpublished_blog_post', 
+        target: JSON.stringify({ title: postTitle }), 
+        metadata: { postId } 
+      }),
 
     deleted: (userId: string, role: Role, postTitle: string, postId: string) =>
-      logActivity({ actorId: userId, actorRole: role, action: 'deleted_blog_post', target: { title: postTitle }, metadata: { postId } })
+      logActivity({ 
+        actorId: userId, 
+        actorRole: role, 
+        action: 'deleted_blog_post', 
+        target: JSON.stringify({ title: postTitle }), 
+        metadata: { postId } 
+      })
   },
 
+  /**
+   * Authentication activity logging
+   */
   auth: {
     adminLogin: (userId: string, email: string, req?: Request) =>
-      logActivity({ actorId: userId, actorRole: 'ADMIN', action: 'admin_login', target: { email }, req }),
+      logActivity({ 
+        actorId: userId, 
+        actorRole: 'ADMIN', 
+        action: 'admin_login', 
+        target: JSON.stringify({ email }), 
+        req 
+      }),
     
     affiliateLogin: (userId: string, email: string, req?: Request) =>
-      logActivity({ actorId: userId, actorRole: 'AFFILIATE', action: 'affiliate_login', target: { email }, req }),
+      logActivity({ 
+        actorId: userId, 
+        actorRole: 'AFFILIATE', 
+        action: 'affiliate_login', 
+        target: JSON.stringify({ email }), 
+        req 
+      }),
     
     userLogin: (userId: string, email: string, req?: Request) =>
-      logActivity({ actorId: userId, actorRole: 'USER', action: 'user_login', target: { email }, req }),
+      logActivity({ 
+        actorId: userId, 
+        actorRole: 'USER', 
+        action: 'user_login', 
+        target: JSON.stringify({ email }), 
+        req 
+      }),
   },
 
+  /**
+   * Global settings activity logging
+   */
   globalSettings: {
-    updated: (userId: string, changes?: any) =>
-      logActivity({ actorId: userId, actorRole: 'ADMIN', action: 'updated_global_settings', metadata: { changes } })
+    updated: (userId: string, changes?: Record<string, unknown>) =>
+      logActivity({ 
+        actorId: userId, 
+        actorRole: 'ADMIN', 
+        action: 'updated_global_settings', 
+        metadata: { changes } 
+      })
   },
 
+  /**
+   * User management activity logging
+   */
   user: {
     roleChanged: (adminId: string, targetUserId: string, newRole: Role, targetEmail?: string) =>
       logActivity({ 
@@ -169,6 +263,9 @@ export const ActivityLogger = {
       }),
   },
 
+  /**
+   * Affiliate management activity logging
+   */
   affiliate: {
     created: (userId: string, role: Role, affiliateId: string, affiliateName: string) =>
       logActivity({ 
@@ -179,7 +276,7 @@ export const ActivityLogger = {
         metadata: { affiliateId, affiliateName }
       }),
     
-    updated: (userId: string, role: Role, affiliateId: string, changes?: any) =>
+    updated: (userId: string, role: Role, affiliateId: string, changes?: Record<string, unknown>) =>
       logActivity({ 
         actorId: userId, 
         actorRole: role, 
@@ -207,6 +304,9 @@ export const ActivityLogger = {
       }),
   },
 
+  /**
+   * Payout activity logging
+   */
   payout: {
     processed: (adminId: string, affiliateId: string, amount: number, transferId: string) =>
       logActivity({ 
@@ -227,6 +327,9 @@ export const ActivityLogger = {
       }),
   },
 
+  /**
+   * Stripe integration activity logging
+   */
   stripe: {
     accountCreated: (userId: string, stripeAccountId: string) =>
       logActivity({ 

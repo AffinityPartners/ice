@@ -1,17 +1,31 @@
+/**
+ * FAQ API Route (Single FAQ)
+ * 
+ * Handles operations for individual FAQs.
+ * GET: Retrieve a single FAQ by ID
+ * PUT: Update a FAQ (admin only)
+ * DELETE: Remove a FAQ (admin only)
+ */
+
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { eq } from 'drizzle-orm';
+import { db, faqs } from '@/db';
 import { requireRole } from '@/lib/auth';
 
-// GET /api/admin/faq/[id] - Get single FAQ
+/**
+ * GET /api/admin/faq/[id]
+ * Retrieves a single FAQ by ID with category information.
+ */
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await params;
   try {
-    const faq = await prisma.fAQ.findUnique({
-      where: { id },
-      include: {
+    const { id } = await params;
+    
+    const faq = await db.query.faqs.findFirst({
+      where: eq(faqs.id, id),
+      with: {
         category: true,
       },
     });
@@ -30,33 +44,42 @@ export async function GET(
   }
 }
 
-// PUT /api/admin/faq/[id] - Update FAQ
+/**
+ * PUT /api/admin/faq/[id]
+ * Updates a FAQ. Requires admin authentication.
+ */
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await params;
   try {
+    const { id } = await params;
     await requireRole('ADMIN');
 
     const body = await request.json();
     const { question, answer, categoryId, order, isActive } = body;
 
-    const faq = await prisma.fAQ.update({
-      where: { id },
-      data: {
+    // Update the FAQ
+    const [updatedFaq] = await db.update(faqs)
+      .set({
         question,
         answer,
         categoryId: categoryId || null,
         order,
         isActive,
-      },
-      include: {
+      })
+      .where(eq(faqs.id, id))
+      .returning();
+
+    // Fetch with category relation
+    const faqWithCategory = await db.query.faqs.findFirst({
+      where: eq(faqs.id, updatedFaq.id),
+      with: {
         category: true,
       },
     });
 
-    return NextResponse.json(faq);
+    return NextResponse.json(faqWithCategory);
   } catch (error) {
     console.error('Error updating FAQ:', error);
     return NextResponse.json(
@@ -66,18 +89,19 @@ export async function PUT(
   }
 }
 
-// DELETE /api/admin/faq/[id] - Delete FAQ
+/**
+ * DELETE /api/admin/faq/[id]
+ * Removes a FAQ. Requires admin authentication.
+ */
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await params;
   try {
+    const { id } = await params;
     await requireRole('ADMIN');
 
-    await prisma.fAQ.delete({
-      where: { id },
-    });
+    await db.delete(faqs).where(eq(faqs.id, id));
 
     return NextResponse.json({ success: true });
   } catch (error) {

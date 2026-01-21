@@ -1,9 +1,21 @@
+/**
+ * Stripe Status API Route
+ * 
+ * Retrieves the current Stripe Connect account status for an affiliate.
+ * Syncs the status from Stripe to the local database.
+ */
+
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
+import { eq } from 'drizzle-orm';
 import { authOptions } from '@/lib/auth-options';
-import { prisma } from '@/lib/prisma';
+import { db, users, affiliates } from '@/db';
 import { retrieveAccount } from '@/lib/stripe';
 
+/**
+ * GET /api/affiliate/stripe/status
+ * Checks Stripe Connect account status and syncs with local database.
+ */
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);
@@ -12,11 +24,13 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
-      include: { affiliate: true }
+    // Get user with affiliate profile
+    const user = await db.query.users.findFirst({
+      where: eq(users.email, session.user.email),
+      with: { affiliate: true }
     });
 
+    // Return not connected if no Stripe account
     if (!user?.affiliate?.stripeAccountId) {
       return NextResponse.json({ 
         connected: false,
@@ -29,7 +43,8 @@ export async function GET() {
     // Get account details from Stripe
     const account = await retrieveAccount(user.affiliate.stripeAccountId);
 
-    const updateData: any = {
+    // Build update data
+    const updateData: Record<string, unknown> = {
       stripeOnboardingComplete: account.details_submitted,
       stripeChargesEnabled: account.charges_enabled,
       stripePayoutsEnabled: account.payouts_enabled,
@@ -40,10 +55,9 @@ export async function GET() {
     }
 
     // Update local database with Stripe status
-    await prisma.affiliate.update({
-      where: { id: user.affiliate.id },
-      data: updateData
-    });
+    await db.update(affiliates)
+      .set(updateData)
+      .where(eq(affiliates.id, user.affiliate.id));
 
     return NextResponse.json({
       connected: true,

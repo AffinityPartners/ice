@@ -1,9 +1,22 @@
+/**
+ * Stripe Onboarding API Route
+ * 
+ * Handles Stripe Connect onboarding for affiliates.
+ * Creates a Stripe Connect account if one doesn't exist,
+ * then generates an onboarding link.
+ */
+
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
+import { eq } from 'drizzle-orm';
 import { authOptions } from '@/lib/auth-options';
-import { prisma } from '@/lib/prisma';
+import { db, users, affiliates } from '@/db';
 import { createConnectAccount, createAccountLink } from '@/lib/stripe';
 
+/**
+ * POST /api/affiliate/stripe/onboarding
+ * Creates or retrieves a Stripe Connect account and returns an onboarding URL.
+ */
 export async function POST() {
   try {
     const session = await getServerSession(authOptions);
@@ -12,9 +25,10 @@ export async function POST() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
-      include: { affiliate: true }
+    // Get user with affiliate profile
+    const user = await db.query.users.findFirst({
+      where: eq(users.email, session.user.email),
+      with: { affiliate: true }
     });
 
     if (!user?.affiliate) {
@@ -39,10 +53,9 @@ export async function POST() {
       stripeAccountId = account.id;
 
       // Update affiliate with Stripe account ID
-      await prisma.affiliate.update({
-        where: { id: user.affiliate.id },
-        data: { stripeAccountId }
-      });
+      await db.update(affiliates)
+        .set({ stripeAccountId })
+        .where(eq(affiliates.id, user.affiliate.id));
     }
 
     // Create account link for onboarding
@@ -53,10 +66,9 @@ export async function POST() {
     );
 
     // Update onboarding URL
-    await prisma.affiliate.update({
-      where: { id: user.affiliate.id },
-      data: { stripeOnboardingUrl: accountLink.url }
-    });
+    await db.update(affiliates)
+      .set({ stripeOnboardingUrl: accountLink.url })
+      .where(eq(affiliates.id, user.affiliate.id));
 
     return NextResponse.json({ url: accountLink.url });
   } catch (error) {

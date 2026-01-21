@@ -1,9 +1,23 @@
+/**
+ * Make Me Admin API Route
+ * 
+ * Setup route for creating the initial admin user.
+ * Uses ADMIN_EMAILS environment variable for authorization.
+ * 
+ * IMPORTANT: Secure or remove after initial admin creation in production.
+ */
+
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
+import { eq, count } from 'drizzle-orm';
 import { authOptions } from '@/lib/auth-options';
-import { prisma } from '@/lib/prisma';
+import { db, users } from '@/db';
 
-// IMPORTANT: This is a setup route - secure or remove after initial admin creation
+/**
+ * GET /api/admin/make-me-admin
+ * Promotes the current user to admin role.
+ * Authorization is controlled by ADMIN_EMAILS environment variable.
+ */
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);
@@ -17,8 +31,12 @@ export async function GET() {
     
     // If no ADMIN_EMAILS are set, allow the first user to become admin
     if (allowedEmails.length === 0) {
-      const adminCount = await prisma.user.count({ where: { role: 'ADMIN' } });
-      if (adminCount > 0) {
+      const [adminCountResult] = await db
+        .select({ count: count() })
+        .from(users)
+        .where(eq(users.role, 'ADMIN'));
+      
+      if ((adminCountResult?.count || 0) > 0) {
         return NextResponse.json({ 
           error: 'Admin already exists. Only the first user can become admin when ADMIN_EMAILS is not set.' 
         }, { status: 403 });
@@ -30,8 +48,8 @@ export async function GET() {
     }
 
     // Check if already admin
-    const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
+    const user = await db.query.users.findFirst({
+      where: eq(users.email, session.user.email),
     });
 
     if (user?.role === 'ADMIN') {
@@ -39,10 +57,10 @@ export async function GET() {
     }
 
     // Update to admin
-    const updatedUser = await prisma.user.update({
-      where: { email: session.user.email },
-      data: { role: 'ADMIN' },
-    });
+    const [updatedUser] = await db.update(users)
+      .set({ role: 'ADMIN' })
+      .where(eq(users.email, session.user.email))
+      .returning();
 
     return NextResponse.json({
       message: 'Success! You are now an admin. Please sign out and sign back in.',

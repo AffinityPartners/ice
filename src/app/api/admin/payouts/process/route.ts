@@ -1,9 +1,23 @@
+/**
+ * Payout Processing API Route
+ * 
+ * Processes commission payouts to affiliates via Stripe Connect.
+ * Handles the entire payout flow including validation, transfer creation,
+ * and database updates.
+ */
+
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
+import { eq, sql } from 'drizzle-orm';
 import { authOptions } from '@/lib/auth-options';
-import { prisma } from '@/lib/prisma';
+import { db, affiliates, commissionLogs, payoutLogs } from '@/db';
 import { createPayout } from '@/lib/stripe';
 
+/**
+ * POST /api/admin/payouts/process
+ * Processes a payout for an affiliate.
+ * Validates amount against unpaid commissions before processing.
+ */
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
@@ -23,12 +37,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Get affiliate with unpaid commissions
-    const affiliate = await prisma.affiliate.findUnique({
-      where: { id: affiliateId },
-      include: {
-        commissionLogs: {
-          where: { is_paid: false }
-        },
+    const affiliate = await db.query.affiliates.findFirst({
+      where: eq(affiliates.id, affiliateId),
+      with: {
+        commissionLogs: true,
         user: true
       }
     });
@@ -47,9 +59,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Filter unpaid commissions
+    const unpaidCommissions = affiliate.commissionLogs.filter(log => !log.isPaid);
+
     // Calculate total unpaid amount
-    const totalUnpaid = affiliate.commissionLogs.reduce(
-      (sum, log) => sum + (log.amount_cents || 0),
+    const totalUnpaid = unpaidCommissions.reduce(
+      (sum, log) => sum + (log.amountCents || 0),
       0
     );
 
@@ -68,37 +83,28 @@ export async function POST(request: NextRequest) {
     );
 
     // Create payout log
-    const payoutLog = await prisma.payout_log.create({
-      data: {
-        affiliate_id: affiliateId,
-        stripe_transfer_id: transfer.id,
-        amount_cents: amount,
-        status: 'COMPLETED',
-        notes: `Payout for ${affiliate.commissionLogs.length} commissions`
-      }
-    });
+    const [payoutLog] = await db.insert(payoutLogs).values({
+      affiliateId: affiliateId,
+      stripeTransferId: transfer.id,
+      amountCents: amount,
+      status: 'COMPLETED',
+      notes: `Payout for ${unpaidCommissions.length} commissions`
+    }).returning();
 
     // Mark commissions as paid
-    await prisma.commission_log.updateMany({
-      where: {
-        affiliate_id: affiliateId,
-        is_paid: false
-      },
-      data: {
-        is_paid: true
-      }
-    });
+    await db.update(commissionLogs)
+      .set({ isPaid: true })
+      .where(eq(commissionLogs.affiliateId, affiliateId));
 
-    // Update affiliate totals
-    await prisma.affiliate.update({
-      where: { id: affiliateId },
-      data: {
-        totalEarnedCents: { increment: amount },
-        unpaidBalanceCents: { decrement: amount },
+    // Update affiliate totals using SQL increment
+    await db.update(affiliates)
+      .set({
+        totalEarnedCents: sql`${affiliates.totalEarnedCents} + ${amount}`,
+        unpaidBalanceCents: sql`${affiliates.unpaidBalanceCents} - ${amount}`,
         lastPayoutDate: new Date(),
         lastPayoutAmountCents: amount
-      }
-    });
+      })
+      .where(eq(affiliates.id, affiliateId));
 
     // TODO: Send email notification to affiliate if enabled
 

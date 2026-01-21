@@ -1,14 +1,28 @@
+/**
+ * User Role Management API Route
+ * 
+ * Handles user role changes.
+ * PUT: Update a user's role (admin only)
+ */
+
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
+import { eq } from 'drizzle-orm';
 import { authOptions } from '@/lib/auth-options';
-import { prisma } from '@/lib/prisma';
+import { db, users, affiliates, type Role } from '@/db';
 
+/**
+ * PUT /api/admin/users/[id]/role
+ * Updates a user's role. Requires admin authentication.
+ * Creates an affiliate profile if changing role to AFFILIATE.
+ */
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await params;
   try {
+    const { id } = await params;
+    
     const session = await getServerSession(authOptions);
     
     if (!session?.user || session.user.role !== 'ADMIN') {
@@ -16,8 +30,9 @@ export async function PUT(
     }
 
     const body = await request.json();
-    const { role } = body;
+    const { role } = body as { role: Role };
 
+    // Validate role
     if (!['USER', 'AFFILIATE', 'ADMIN'].includes(role)) {
       return NextResponse.json(
         { error: 'Invalid role' },
@@ -26,38 +41,36 @@ export async function PUT(
     }
 
     // Update user role
-    const updatedUser = await prisma.user.update({
-      where: { id: id },
-      data: { role },
-    });
+    const [updatedUser] = await db.update(users)
+      .set({ role })
+      .where(eq(users.id, id))
+      .returning();
 
     // If changing to AFFILIATE and no affiliate profile exists, create one
     if (role === 'AFFILIATE') {
-      const existingAffiliate = await prisma.affiliate.findUnique({
-        where: { userId: id },
+      const existingAffiliate = await db.query.affiliates.findFirst({
+        where: eq(affiliates.userId, id),
       });
 
       if (!existingAffiliate) {
         const slug = `affiliate-${id.slice(-8)}`;
-        await prisma.affiliate.create({
-          data: {
-            userId: id,
-            slug,
-            companyName: updatedUser.name || 'New Affiliate',
-            contactEmail: updatedUser.email!,
-            isActive: true,
-            primaryColor: '#245789',
-            heroHeading: 'Protect Your Emergency Information',
-            heroSubtext: 'Get ICE Tracer today',
-            ctaText: 'Get Started',
-          },
+        await db.insert(affiliates).values({
+          userId: id,
+          slug,
+          companyName: updatedUser.name || 'New Affiliate',
+          contactEmail: updatedUser.email!,
+          isActive: true,
+          primaryColor: '#245789',
+          heroHeading: 'Protect Your Emergency Information',
+          heroSubtext: 'Get ICE Tracer today',
+          ctaText: 'Get Started',
         });
       }
     }
 
     // Log the action
-    const adminUser = await prisma.user.findUnique({
-      where: { email: session.user.email! }
+    const adminUser = await db.query.users.findFirst({
+      where: eq(users.email, session.user.email!)
     });
 
     if (adminUser) {

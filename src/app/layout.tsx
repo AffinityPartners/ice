@@ -6,6 +6,7 @@ import { ConditionalHeader } from "@/components/layout/ConditionalHeader";
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { SessionProvider } from "@/components/providers/SessionProvider";
 import { OfflineProvider } from "@/components/providers/OfflineProvider";
+import { OrganizationJsonLd, WebSiteJsonLd, SoftwareApplicationJsonLd } from "@/components/seo/JsonLd";
 
 const lato = Lato({ 
   subsets: ["latin"],
@@ -36,7 +37,7 @@ export const metadata: Metadata = {
     description: 'Instant access to critical medical information during emergencies',
     images: [
       {
-        url: '/og-image.jpg',
+        url: '/images/ICE-Tracer-home-bg.png',
         width: 1200,
         height: 630,
         alt: 'ICE Tracer Emergency Medical Information System',
@@ -47,7 +48,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'ICE Tracer - Emergency Medical Information System',
     description: 'Instant access to critical medical information during emergencies',
-    images: ['/og-image.jpg'],
+    images: ['/images/ICE-Tracer-home-bg.png'],
   },
   robots: {
     index: true,
@@ -95,6 +96,10 @@ export default function RootLayout({
         </SessionProvider>
         {/* Vercel Analytics - tracks page views and visitor metrics */}
         <Analytics />
+        {/* Structured Data (JSON-LD) for SEO - helps search engines understand the site */}
+        <OrganizationJsonLd />
+        <WebSiteJsonLd />
+        <SoftwareApplicationJsonLd />
       </body>
     </html>
   );

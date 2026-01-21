@@ -1,19 +1,33 @@
+/**
+ * Blog Post API Route (Single Post)
+ * 
+ * Handles operations for individual blog posts.
+ * GET: Retrieve a single post by ID
+ * PUT: Full update of a post (admin only)
+ * PATCH: Partial update (e.g., publish/unpublish) (admin only)
+ * DELETE: Remove a post (admin only)
+ */
+
 import { NextRequest, NextResponse } from 'next/server';
+import { eq, and, ne } from 'drizzle-orm';
 import { getSession } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
+import { db, posts } from '@/db';
 import { ActivityLogger } from '@/lib/activity-logger';
 
-// GET /api/admin/blog/[id] - Get single post
+/**
+ * GET /api/admin/blog/[id]
+ * Retrieves a single blog post by ID with category information.
+ */
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await params;
   try {
     const { id } = await params;
-    const post = await prisma.post.findUnique({
-      where: { id },
-      include: {
+    
+    const post = await db.query.posts.findFirst({
+      where: eq(posts.id, id),
+      with: {
         category: true,
       },
     });
@@ -32,14 +46,18 @@ export async function GET(
   }
 }
 
-// PUT /api/admin/blog/[id] - Update entire post
+/**
+ * PUT /api/admin/blog/[id]
+ * Updates an entire blog post. Requires admin authentication.
+ * Validates slug uniqueness (excluding the current post).
+ */
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await params;
   try {
     const { id } = await params;
+    
     const session = await getSession();
     if (!session?.user || session.user.role !== 'ADMIN') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -68,11 +86,11 @@ export async function PUT(
 
     // Check if slug is unique (excluding current post)
     if (slug) {
-      const existingPost = await prisma.post.findFirst({
-        where: {
-          slug,
-          NOT: { id },
-        },
+      const existingPost = await db.query.posts.findFirst({
+        where: and(
+          eq(posts.slug, slug),
+          ne(posts.id, id)
+        ),
       });
 
       if (existingPost) {
@@ -83,9 +101,9 @@ export async function PUT(
       }
     }
 
-    const post = await prisma.post.update({
-      where: { id },
-      data: {
+    // Update the post using Drizzle
+    const [post] = await db.update(posts)
+      .set({
         title,
         slug,
         excerpt: excerpt || null,
@@ -103,8 +121,9 @@ export async function PUT(
         featuredOrder: featuredOrder || null,
         readingTime: readingTime || null,
         publishedAt: published && publishedAt ? new Date(publishedAt) : null,
-      },
-    });
+      })
+      .where(eq(posts.id, id))
+      .returning();
 
     // Log the activity
     await ActivityLogger.blogPost.updated(
@@ -125,14 +144,18 @@ export async function PUT(
   }
 }
 
-// PATCH /api/admin/blog/[id] - Partial update (e.g., publish/unpublish)
+/**
+ * PATCH /api/admin/blog/[id]
+ * Partial update for a blog post (e.g., publish/unpublish).
+ * Requires admin authentication.
+ */
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await params;
   try {
     const { id } = await params;
+    
     const session = await getSession();
     if (!session?.user || session.user.role !== 'ADMIN') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -140,12 +163,13 @@ export async function PATCH(
 
     const body = await request.json();
 
-    const post = await prisma.post.update({
-      where: { id },
-      data: body,
-    });
+    // Update with partial data
+    const [post] = await db.update(posts)
+      .set(body)
+      .where(eq(posts.id, id))
+      .returning();
 
-    // Log specific activities
+    // Log specific activities for publish/unpublish
     if (body.published !== undefined) {
       if (body.published) {
         await ActivityLogger.blogPost.published(
@@ -174,31 +198,34 @@ export async function PATCH(
   }
 }
 
-// DELETE /api/admin/blog/[id] - Delete post
+/**
+ * DELETE /api/admin/blog/[id]
+ * Removes a blog post. Requires admin authentication.
+ * Logs the deletion for audit purposes.
+ */
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await params;
   try {
     const { id } = await params;
+    
     const session = await getSession();
     if (!session?.user || session.user.role !== 'ADMIN') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     // Get post info before deletion for logging
-    const post = await prisma.post.findUnique({
-      where: { id },
+    const post = await db.query.posts.findFirst({
+      where: eq(posts.id, id),
     });
 
     if (!post) {
       return NextResponse.json({ error: 'Post not found' }, { status: 404 });
     }
 
-    await prisma.post.delete({
-      where: { id },
-    });
+    // Delete the post
+    await db.delete(posts).where(eq(posts.id, id));
 
     // Log the activity
     await ActivityLogger.blogPost.deleted(

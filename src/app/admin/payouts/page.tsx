@@ -1,4 +1,11 @@
-import { prisma } from '@/lib/prisma';
+/**
+ * Admin Payouts Page
+ * 
+ * Dashboard for managing affiliate commission payouts.
+ * Currently displays placeholder data as the full payout system
+ * requires additional configuration (Stripe Connect integration).
+ */
+
 import { 
   DollarSign, 
   Clock, 
@@ -6,7 +13,6 @@ import {
   Info,
   Send,
   FileText,
-  TrendingUp,
   AlertCircle,
   Download,
 } from 'lucide-react';
@@ -27,6 +33,10 @@ import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
 
+/**
+ * Retrieves payout statistics.
+ * Currently returns placeholder data until commission tracking is set up.
+ */
 async function getPayoutStats() {
   // For now, return placeholder data since commission tracking may not be set up
   return {
@@ -37,6 +47,10 @@ async function getPayoutStats() {
   };
 }
 
+/**
+ * Main admin payouts page component.
+ * Displays payout management interface with stats and transaction tables.
+ */
 export default async function AdminPayoutsPage() {
   const stats = await getPayoutStats();
 

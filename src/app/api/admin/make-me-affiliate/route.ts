@@ -1,9 +1,22 @@
+/**
+ * Make Me Affiliate API Route
+ * 
+ * Development/testing endpoint that converts the current user to an affiliate.
+ * Creates an affiliate profile and updates the user's role.
+ */
+
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
+import { eq } from 'drizzle-orm';
 import { authOptions } from '@/lib/auth-options';
-import { prisma } from '@/lib/prisma';
+import { db, users, affiliates } from '@/db';
 import { generateSlug } from '@/lib/utils';
 
+/**
+ * GET /api/admin/make-me-affiliate
+ * Converts the current authenticated user to an affiliate.
+ * Creates affiliate profile with default settings.
+ */
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);
@@ -12,10 +25,10 @@ export async function GET() {
       return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     }
 
-    // Check if user exists
-    const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
-      include: { affiliate: true }
+    // Check if user exists with affiliate profile
+    const user = await db.query.users.findFirst({
+      where: eq(users.email, session.user.email),
+      with: { affiliate: true }
     });
 
     if (!user) {
@@ -31,29 +44,26 @@ export async function GET() {
     }
 
     // Update user role to AFFILIATE
-    await prisma.user.update({
-      where: { id: user.id },
-      data: { role: 'AFFILIATE' }
-    });
+    await db.update(users)
+      .set({ role: 'AFFILIATE' })
+      .where(eq(users.id, user.id));
 
-    // Create affiliate profile
+    // Create affiliate profile with default settings
     const slug = generateSlug(user.name || user.email?.split('@')[0] || 'affiliate');
     
-    const affiliate = await prisma.affiliate.create({
-      data: {
-        userId: user.id,
-        slug: slug,
-        companyName: user.name || 'My Company',
-        firstName: user.firstName,
-        lastName: user.lastName,
-        contactEmail: user.email!,
-        isActive: true,
-        primaryColor: '#245789',
-        heroHeading: 'Protect Your Emergency Information',
-        heroSubtext: 'Get ICE Tracer today and ensure your medical information is always accessible',
-        ctaText: 'Get Started Now',
-      }
-    });
+    const [affiliate] = await db.insert(affiliates).values({
+      userId: user.id,
+      slug: slug,
+      companyName: user.name || 'My Company',
+      firstName: user.firstName,
+      lastName: user.lastName,
+      contactEmail: user.email!,
+      isActive: true,
+      primaryColor: '#245789',
+      heroHeading: 'Protect Your Emergency Information',
+      heroSubtext: 'Get ICE Tracer today and ensure your medical information is always accessible',
+      ctaText: 'Get Started Now',
+    }).returning();
 
     return NextResponse.json({
       message: 'Success! You are now an affiliate. Please sign out and sign back in.',

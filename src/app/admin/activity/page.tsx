@@ -1,12 +1,17 @@
-import { prisma } from '@/lib/prisma';
+/**
+ * Admin Activity Page
+ * 
+ * Displays activity logs and statistics for monitoring user actions.
+ * Provides insights into system usage by role and action type.
+ */
+
+import { desc, gte, count, eq } from 'drizzle-orm';
+import { db, activityLogs, type Role } from '@/db';
 import ActivityTable from './ActivityTable';
 import { 
   History, 
   User, 
   Shield,
-  DollarSign,
-  FileText,
-  Settings,
   Activity,
   UserCheck,
   TrendingUp,
@@ -17,100 +22,97 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 export const dynamic = 'force-dynamic';
 
+/**
+ * Fetches activity logs with optional filters.
+ * Returns logs with actor information, limited to prevent performance issues.
+ */
 async function getActivityLogs(filters?: {
   actorRole?: string;
   action?: string;
   startDate?: Date;
   endDate?: Date;
 }) {
-  const where: any = {};
-
-  if (filters?.actorRole && filters.actorRole !== 'all') {
-    where.actorRole = filters.actorRole;
-  }
-
-  if (filters?.action && filters.action !== 'all') {
-    where.action = filters.action;
-  }
-
-  if (filters?.startDate || filters?.endDate) {
-    where.createdAt = {};
-    if (filters.startDate) {
-      where.createdAt.gte = filters.startDate;
-    }
-    if (filters.endDate) {
-      where.createdAt.lte = filters.endDate;
-    }
-  }
-
-  const logs = await prisma.activityLog.findMany({
-    where,
-    orderBy: { createdAt: 'desc' },
-    include: {
-      actor: {
-        select: {
-          name: true,
-          email: true,
-          image: true,
-        }
-      }
+  // Build the query based on filters
+  const logs = await db.query.activityLogs.findMany({
+    where: filters?.actorRole && filters.actorRole !== 'all' 
+      ? eq(activityLogs.actorRole, filters.actorRole as Role)
+      : undefined,
+    orderBy: [desc(activityLogs.createdAt)],
+    with: {
+      actor: true
     },
-    take: 500, // Limit to prevent performance issues
+    limit: 500, // Limit to prevent performance issues
   });
 
-  return logs;
+  // Transform to include only necessary actor fields
+  return logs.map(log => ({
+    ...log,
+    actor: log.actor ? {
+      name: log.actor.name,
+      email: log.actor.email,
+      image: log.actor.image,
+    } : null
+  }));
 }
 
+/**
+ * Calculates activity statistics including today's count,
+ * total events, unique users, and breakdown by role.
+ */
 async function getActivityStats() {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  const [todayCount, totalCount, uniqueUsers] = await Promise.all([
-    // Today's activity count
-    prisma.activityLog.count({
-      where: {
-        createdAt: {
-          gte: today
-        }
-      }
-    }),
-    // Total activity count
-    prisma.activityLog.count(),
-    // Unique users
-    prisma.activityLog.groupBy({
-      by: ['actorId'],
-      _count: true,
-    })
-  ]);
+  // Get today's activity count
+  const [todayCountResult] = await db
+    .select({ count: count() })
+    .from(activityLogs)
+    .where(gte(activityLogs.createdAt, today));
 
-  // Get activity by role
-  const activityByRole = await prisma.activityLog.groupBy({
-    by: ['actorRole'],
-    _count: true,
-    orderBy: {
-      _count: {
-        actorRole: 'desc'
-      }
-    }
-  });
+  // Get total count
+  const [totalCountResult] = await db
+    .select({ count: count() })
+    .from(activityLogs);
+
+  // Get unique actors
+  const uniqueActors = await db
+    .selectDistinct({ actorId: activityLogs.actorId })
+    .from(activityLogs);
+
+  // Get activity by role using raw counts
+  const adminCount = await db
+    .select({ count: count() })
+    .from(activityLogs)
+    .where(eq(activityLogs.actorRole, 'ADMIN'));
+  
+  const affiliateCount = await db
+    .select({ count: count() })
+    .from(activityLogs)
+    .where(eq(activityLogs.actorRole, 'AFFILIATE'));
+  
+  const userCount = await db
+    .select({ count: count() })
+    .from(activityLogs)
+    .where(eq(activityLogs.actorRole, 'USER'));
+
+  const activityByRole = [
+    { actorRole: 'ADMIN' as Role, _count: adminCount[0]?.count || 0 },
+    { actorRole: 'AFFILIATE' as Role, _count: affiliateCount[0]?.count || 0 },
+    { actorRole: 'USER' as Role, _count: userCount[0]?.count || 0 },
+  ].filter(r => r._count > 0)
+   .sort((a, b) => b._count - a._count);
 
   return {
-    todayCount,
-    totalCount,
-    uniqueUsers: uniqueUsers.length,
+    todayCount: todayCountResult?.count || 0,
+    totalCount: totalCountResult?.count || 0,
+    uniqueUsers: uniqueActors.length,
     activityByRole
   };
 }
 
-const getActionIcon = (action: string) => {
-  if (action.includes('payment') || action.includes('commission')) return DollarSign;
-  if (action.includes('blog') || action.includes('post')) return FileText;
-  if (action.includes('settings') || action.includes('config')) return Settings;
-  if (action.includes('user') || action.includes('profile')) return User;
-  if (action.includes('admin')) return Shield;
-  return Activity;
-};
-
+/**
+ * Returns the appropriate icon component for a given role.
+ */
 const getRoleIcon = (role: string) => {
   switch (role) {
     case 'ADMIN':
@@ -124,6 +126,10 @@ const getRoleIcon = (role: string) => {
   }
 };
 
+/**
+ * Main admin activity page component.
+ * Displays activity statistics and a searchable log table.
+ */
 export default async function AdminActivityPage() {
   const [logs, stats] = await Promise.all([
     getActivityLogs(),
@@ -148,7 +154,7 @@ export default async function AdminActivityPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              Today's Activity
+              Today&apos;s Activity
             </CardTitle>
             <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center">
               <Clock className="h-4 w-4 text-primary" />
@@ -228,7 +234,9 @@ export default async function AdminActivityPage() {
           <div className="space-y-4">
             {stats.activityByRole.map((roleData) => {
               const Icon = getRoleIcon(roleData.actorRole);
-              const percentage = (roleData._count / stats.totalCount * 100).toFixed(1);
+              const percentage = stats.totalCount > 0 
+                ? (roleData._count / stats.totalCount * 100).toFixed(1)
+                : '0';
               
               return (
                 <div key={roleData.actorRole} className="flex items-center justify-between">

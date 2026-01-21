@@ -1,5 +1,16 @@
+/**
+ * Admin Affiliates Page
+ * 
+ * Displays a dashboard for managing affiliate partners including:
+ * - Statistics overview (total, active, approved affiliates)
+ * - Commission structure information
+ * - Searchable affiliate table
+ * - Quick action links
+ */
+
+import { eq, desc } from 'drizzle-orm';
 import { requireRole } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
+import { db, affiliates } from '@/db';
 import { revalidatePath } from 'next/cache';
 import AffiliateTableWithSearch from '@/components/admin/AffiliateTableWithSearch';
 import {
@@ -10,7 +21,6 @@ import {
   Eye,
   ExternalLink,
   Edit,
-  Info,
   Megaphone,
   Shield,
   AlertTriangle,
@@ -21,6 +31,10 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 
+/**
+ * Server action to delete an affiliate.
+ * Revalidates the affiliates page after deletion.
+ */
 async function deleteAffiliate(formData: FormData) {
   'use server';
 
@@ -28,38 +42,43 @@ async function deleteAffiliate(formData: FormData) {
 
   const affiliateId = formData.get('affiliateId') as string;
 
-  await prisma.affiliate.delete({
-    where: { id: affiliateId },
-  });
+  await db.delete(affiliates).where(eq(affiliates.id, affiliateId));
 
   revalidatePath('/admin/affiliates');
 }
 
+/**
+ * Main admin affiliates page component.
+ * Displays affiliate management dashboard with stats, table, and quick actions.
+ */
 export default async function AdminAffiliatesPage() {
   await requireRole('ADMIN');
 
-  const affiliates = await prisma.affiliate.findMany({
-    include: {
-      user: {
-        select: {
-          email: true,
-          name: true,
-        },
-      },
-      referrals: {
-        select: {
-          id: true,
-        },
-      },
+  // Fetch all affiliates with user and referral information
+  const allAffiliates = await db.query.affiliates.findMany({
+    with: {
+      user: true,
+      referrals: true,
     },
-    orderBy: { createdAt: 'desc' },
+    orderBy: [desc(affiliates.createdAt)],
   });
 
+  // Transform data for the table component
+  const affiliatesForTable = allAffiliates.map(a => ({
+    ...a,
+    user: {
+      email: a.user.email,
+      name: a.user.name,
+    },
+    referrals: a.referrals.map(r => ({ id: r.id })),
+  }));
+
+  // Calculate statistics
   const stats = {
-    totalAffiliates: affiliates.length,
-    activeAffiliates: affiliates.filter(a => a.isActive).length,
-    totalReferrals: affiliates.reduce((sum, a) => sum + a.referrals.length, 0),
-    approvedAffiliates: affiliates.filter(a => a.isActive).length,
+    totalAffiliates: allAffiliates.length,
+    activeAffiliates: allAffiliates.filter(a => a.isActive).length,
+    totalReferrals: allAffiliates.reduce((sum, a) => sum + a.referrals.length, 0),
+    approvedAffiliates: allAffiliates.filter(a => a.isActive).length,
   };
 
   return (
@@ -168,7 +187,7 @@ export default async function AdminAffiliatesPage() {
         </CardHeader>
         <CardContent>
           <AffiliateTableWithSearch 
-            affiliates={affiliates}
+            affiliates={affiliatesForTable}
             deleteAction={deleteAffiliate}
           />
         </CardContent>

@@ -1,7 +1,22 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getSession } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
+/**
+ * FAQ Categories API Route
+ * 
+ * Handles CRUD operations for FAQ categories.
+ * GET: Retrieve all categories with FAQ counts
+ * POST: Create a new category (admin only)
+ */
 
+import { NextRequest, NextResponse } from 'next/server';
+import { asc } from 'drizzle-orm';
+import { getSession } from '@/lib/auth';
+import { db, faqCategories } from '@/db';
+
+/**
+ * GET /api/admin/faq/categories
+ * Retrieves all FAQ categories with FAQ counts.
+ * Requires admin authentication.
+ * Results are ordered by the order field.
+ */
 export async function GET() {
   try {
     const session = await getSession();
@@ -9,16 +24,24 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const categories = await prisma.fAQCategory.findMany({
-      orderBy: { order: 'asc' },
-      include: {
-        _count: {
-          select: { faqs: true }
-        }
-      }
+    // Get categories with their FAQs to count them
+    const categories = await db.query.faqCategories.findMany({
+      orderBy: [asc(faqCategories.order)],
+      with: {
+        faqs: true,
+      },
     });
 
-    return NextResponse.json(categories);
+    // Transform to include _count format for backward compatibility
+    const categoriesWithCount = categories.map(cat => ({
+      ...cat,
+      _count: {
+        faqs: cat.faqs.length
+      },
+      faqs: undefined // Remove the full faqs array from response
+    }));
+
+    return NextResponse.json(categoriesWithCount);
   } catch (error) {
     console.error('Error fetching FAQ categories:', error);
     return NextResponse.json(
@@ -28,6 +51,11 @@ export async function GET() {
   }
 }
 
+/**
+ * POST /api/admin/faq/categories
+ * Creates a new FAQ category.
+ * Requires admin authentication.
+ */
 export async function POST(request: NextRequest) {
   try {
     const session = await getSession();
@@ -37,15 +65,13 @@ export async function POST(request: NextRequest) {
 
     const data = await request.json();
     
-    const category = await prisma.fAQCategory.create({
-      data: {
-        name: data.name,
-        slug: data.slug,
-        description: data.description || null,
-        order: data.order,
-        isActive: data.isActive ?? true,
-      }
-    });
+    const [category] = await db.insert(faqCategories).values({
+      name: data.name,
+      slug: data.slug,
+      description: data.description || null,
+      order: data.order,
+      isActive: data.isActive ?? true,
+    }).returning();
 
     return NextResponse.json(category);
   } catch (error) {

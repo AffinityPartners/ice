@@ -1,13 +1,28 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getSession } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
+/**
+ * FAQ Category API Route (Single Category)
+ * 
+ * Handles operations for individual FAQ categories.
+ * PUT: Update a category (admin only)
+ * DELETE: Remove a category (admin only)
+ */
 
+import { NextRequest, NextResponse } from 'next/server';
+import { eq } from 'drizzle-orm';
+import { getSession } from '@/lib/auth';
+import { db, faqCategories, faqs } from '@/db';
+
+/**
+ * PUT /api/admin/faq/categories/[id]
+ * Updates a FAQ category. Requires admin authentication.
+ * Only updates fields that are provided in the request.
+ */
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await params;
   try {
+    const { id } = await params;
+    
     const session = await getSession();
     if (!session?.user || session.user.role !== 'ADMIN') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -15,16 +30,18 @@ export async function PUT(
 
     const data = await request.json();
     
-    const category = await prisma.fAQCategory.update({
-      where: { id: id },
-      data: {
-        ...(data.name !== undefined && { name: data.name }),
-        ...(data.slug !== undefined && { slug: data.slug }),
-        ...(data.description !== undefined && { description: data.description }),
-        ...(data.order !== undefined && { order: data.order }),
-        ...(data.isActive !== undefined && { isActive: data.isActive }),
-      }
-    });
+    // Build update object with only provided fields
+    const updateData: Record<string, unknown> = {};
+    if (data.name !== undefined) updateData.name = data.name;
+    if (data.slug !== undefined) updateData.slug = data.slug;
+    if (data.description !== undefined) updateData.description = data.description;
+    if (data.order !== undefined) updateData.order = data.order;
+    if (data.isActive !== undefined) updateData.isActive = data.isActive;
+
+    const [category] = await db.update(faqCategories)
+      .set(updateData)
+      .where(eq(faqCategories.id, id))
+      .returning();
 
     return NextResponse.json(category);
   } catch (error) {
@@ -36,27 +53,30 @@ export async function PUT(
   }
 }
 
+/**
+ * DELETE /api/admin/faq/categories/[id]
+ * Removes a FAQ category. Requires admin authentication.
+ * First uncategorizes all FAQs in this category, then deletes the category.
+ */
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await params;
   try {
+    const { id } = await params;
+    
     const session = await getSession();
     if (!session?.user || session.user.role !== 'ADMIN') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     // First, update all FAQs in this category to be uncategorized
-    await prisma.fAQ.updateMany({
-      where: { categoryId: id },
-      data: { categoryId: null }
-    });
+    await db.update(faqs)
+      .set({ categoryId: null })
+      .where(eq(faqs.categoryId, id));
 
     // Then delete the category
-    await prisma.fAQCategory.delete({
-      where: { id: id }
-    });
+    await db.delete(faqCategories).where(eq(faqCategories.id, id));
 
     return NextResponse.json({ success: true });
   } catch (error) {

@@ -1,25 +1,41 @@
+/**
+ * User Management API Route (Single User)
+ * 
+ * Handles operations for individual users.
+ * DELETE: Remove a user (admin only)
+ */
+
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
+import { eq } from 'drizzle-orm';
 import { authOptions } from '@/lib/auth-options';
-import { prisma } from '@/lib/prisma';
+import { db, users } from '@/db';
 
+/**
+ * DELETE /api/admin/users/[id]
+ * Deletes a user account. Requires admin authentication.
+ * Prevents admins from deleting their own account.
+ * Related records are deleted via cascade.
+ */
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await params;
   try {
+    const { id } = await params;
+    
     const session = await getServerSession(authOptions);
     
     if (!session?.user || session.user.role !== 'ADMIN') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Don't allow deleting your own account
-    const adminUser = await prisma.user.findUnique({
-      where: { email: session.user.email! }
+    // Get the admin user
+    const adminUser = await db.query.users.findFirst({
+      where: eq(users.email, session.user.email!)
     });
 
+    // Don't allow deleting your own account
     if (adminUser?.id === id) {
       return NextResponse.json(
         { error: 'Cannot delete your own account' },
@@ -28,9 +44,9 @@ export async function DELETE(
     }
 
     // Get user details before deletion for logging
-    const userToDelete = await prisma.user.findUnique({
-      where: { id: id },
-      include: { affiliate: true }
+    const userToDelete = await db.query.users.findFirst({
+      where: eq(users.id, id),
+      with: { affiliate: true }
     });
 
     if (!userToDelete) {
@@ -41,9 +57,7 @@ export async function DELETE(
     }
 
     // Delete user (cascades will handle related records)
-    await prisma.user.delete({
-      where: { id: id },
-    });
+    await db.delete(users).where(eq(users.id, id));
 
     // Log the action
     if (adminUser) {

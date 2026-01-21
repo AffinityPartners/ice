@@ -1,9 +1,23 @@
+/**
+ * Blog Categories API Route
+ * 
+ * Handles CRUD operations for blog categories.
+ * GET: Retrieve all categories with post counts
+ * POST: Create a new category (admin only)
+ */
+
 import { NextRequest, NextResponse } from 'next/server';
+import { eq, asc, count } from 'drizzle-orm';
 import { getSession } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
+import { db, blogCategories, posts } from '@/db';
 import { ActivityLogger } from '@/lib/activity-logger';
 
-// GET /api/admin/blog/categories - Get all blog categories
+/**
+ * GET /api/admin/blog/categories
+ * Retrieves all blog categories with post counts.
+ * Requires admin authentication.
+ * Results are ordered alphabetically by name.
+ */
 export async function GET(request: NextRequest) {
   try {
     const session = await getSession();
@@ -11,16 +25,24 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const categories = await prisma.blogCategory.findMany({
-      orderBy: { name: 'asc' },
-      include: {
-        _count: {
-          select: { posts: true }
-        }
-      }
+    // Get categories with post counts using a subquery
+    const categories = await db.query.blogCategories.findMany({
+      orderBy: [asc(blogCategories.name)],
+      with: {
+        posts: true,
+      },
     });
 
-    return NextResponse.json(categories);
+    // Transform to include _count format for backward compatibility
+    const categoriesWithCount = categories.map(cat => ({
+      ...cat,
+      _count: {
+        posts: cat.posts.length
+      },
+      posts: undefined // Remove the full posts array from response
+    }));
+
+    return NextResponse.json(categoriesWithCount);
   } catch (error) {
     console.error('Error fetching blog categories:', error);
     return NextResponse.json(
@@ -30,7 +52,12 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST /api/admin/blog/categories - Create a new blog category
+/**
+ * POST /api/admin/blog/categories
+ * Creates a new blog category.
+ * Requires admin authentication.
+ * Validates slug uniqueness before creation.
+ */
 export async function POST(request: NextRequest) {
   try {
     const session = await getSession();
@@ -42,8 +69,8 @@ export async function POST(request: NextRequest) {
     const { name, slug, description, isActive = true } = body;
 
     // Check if slug already exists
-    const existing = await prisma.blogCategory.findUnique({
-      where: { slug }
+    const existing = await db.query.blogCategories.findFirst({
+      where: eq(blogCategories.slug, slug),
     });
 
     if (existing) {
@@ -53,14 +80,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const category = await prisma.blogCategory.create({
-      data: {
-        name,
-        slug,
-        description,
-        isActive
-      }
-    });
+    // Create the category
+    const [category] = await db.insert(blogCategories).values({
+      name,
+      slug,
+      description,
+      isActive
+    }).returning();
 
     // Log the activity
     await ActivityLogger.blogPost.created(

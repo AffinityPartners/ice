@@ -1,18 +1,32 @@
+/**
+ * Blog Posts API Route
+ * 
+ * Handles CRUD operations for blog posts.
+ * GET: Retrieve all posts with category relations
+ * POST: Create a new blog post (admin only)
+ */
+
 import { NextRequest, NextResponse } from 'next/server';
+import { eq } from 'drizzle-orm';
 import { getSession } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
+import { db, posts } from '@/db';
 import { ActivityLogger } from '@/lib/activity-logger';
 
+/**
+ * GET /api/admin/blog
+ * Retrieves all blog posts with their category information.
+ * Results are ordered by creation date (newest first).
+ */
 export async function GET() {
   try {
-    const posts = await prisma.post.findMany({
-      include: {
+    const allPosts = await db.query.posts.findMany({
+      with: {
         category: true,
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: (posts, { desc }) => [desc(posts.createdAt)],
     });
 
-    return NextResponse.json(posts);
+    return NextResponse.json(allPosts);
   } catch (error) {
     console.error('Error fetching posts:', error);
     return NextResponse.json(
@@ -22,6 +36,12 @@ export async function GET() {
   }
 }
 
+/**
+ * POST /api/admin/blog
+ * Creates a new blog post.
+ * Requires admin authentication.
+ * Validates slug uniqueness before creation.
+ */
 export async function POST(request: NextRequest) {
   try {
     // Check authentication and admin role
@@ -53,8 +73,8 @@ export async function POST(request: NextRequest) {
     } = body;
 
     // Check if slug is unique
-    const existingPost = await prisma.post.findUnique({
-      where: { slug },
+    const existingPost = await db.query.posts.findFirst({
+      where: eq(posts.slug, slug),
     });
 
     if (existingPost) {
@@ -64,28 +84,26 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create post
-    const post = await prisma.post.create({
-      data: {
-        title,
-        slug,
-        excerpt: excerpt || null,
-        content,
-        image: image || null,
-        author: author || session.user.name || session.user.email || 'Admin',
-        published: published || false,
-        categoryId: categoryId || null,
-        metaTitle: metaTitle || title,
-        metaDescription: metaDescription || excerpt || null,
-        metaKeywords: metaKeywords || null,
-        ogImage: ogImage || image || null,
-        canonicalUrl: canonicalUrl || null,
-        tags: tags || [],
-        featuredOrder: featuredOrder || null,
-        readingTime: readingTime || null,
-        publishedAt: published && publishedAt ? new Date(publishedAt) : null,
-      },
-    });
+    // Create post using Drizzle
+    const [post] = await db.insert(posts).values({
+      title,
+      slug,
+      excerpt: excerpt || null,
+      content,
+      image: image || null,
+      author: author || session.user.name || session.user.email || 'Admin',
+      published: published || false,
+      categoryId: categoryId || null,
+      metaTitle: metaTitle || title,
+      metaDescription: metaDescription || excerpt || null,
+      metaKeywords: metaKeywords || null,
+      ogImage: ogImage || image || null,
+      canonicalUrl: canonicalUrl || null,
+      tags: tags || [],
+      featuredOrder: featuredOrder || null,
+      readingTime: readingTime || null,
+      publishedAt: published && publishedAt ? new Date(publishedAt) : null,
+    }).returning();
 
     // Log the activity
     await ActivityLogger.blogPost.created(

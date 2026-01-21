@@ -1,7 +1,20 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getSession } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
+/**
+ * Affiliate Activity API Route
+ * 
+ * Retrieves affiliate-related activity logs with statistics.
+ * Supports filtering by date range.
+ */
 
+import { NextRequest, NextResponse } from 'next/server';
+import { gte, or, eq, like, desc } from 'drizzle-orm';
+import { getSession } from '@/lib/auth';
+import { db, activityLogs } from '@/db';
+
+/**
+ * GET /api/admin/affiliate-activity
+ * Retrieves affiliate-related activities within a specified date range.
+ * Returns activities and aggregate statistics.
+ */
 export async function GET(request: NextRequest) {
   try {
     const session = await getSession();
@@ -32,49 +45,47 @@ export async function GET(request: NextRequest) {
         break;
     }
 
-    // Fetch affiliate-related activities
-    const activities = await prisma.activityLog.findMany({
-      where: {
-        createdAt: { gte: dateFrom },
-        OR: [
-          { actorRole: 'AFFILIATE' },
-          { action: { startsWith: 'affiliate_' } },
-          { action: { startsWith: 'stripe_' } },
-          { action: { startsWith: 'payout_' } },
-          { action: { startsWith: 'referral_' } },
-          { action: 'profile_updated' },
-          { action: 'page_customized' },
-          { action: 'landing_page_viewed' },
-        ],
-      },
-      include: {
+    // Fetch affiliate-related activities with relations
+    const activities = await db.query.activityLogs.findMany({
+      where: gte(activityLogs.createdAt, dateFrom),
+      with: {
         actor: {
-          include: {
-            affiliate: {
-              select: {
-                id: true,
-                companyName: true,
-                slug: true,
-              },
-            },
+          with: {
+            affiliate: true,
           },
         },
       },
-      orderBy: { createdAt: 'desc' },
-      take: 1000, // Limit to prevent overwhelming response
+      orderBy: [desc(activityLogs.createdAt)],
+      limit: 1000, // Limit to prevent overwhelming response
     });
+
+    // Filter for affiliate-related activities
+    const affiliateActivities = activities.filter(a => 
+      a.actorRole === 'AFFILIATE' ||
+      a.action.startsWith('affiliate_') ||
+      a.action.startsWith('stripe_') ||
+      a.action.startsWith('payout_') ||
+      a.action.startsWith('referral_') ||
+      a.action === 'profile_updated' ||
+      a.action === 'page_customized' ||
+      a.action === 'landing_page_viewed'
+    );
 
     // Calculate stats
     const stats = {
-      totalActions: activities.length,
-      activeAffiliates: new Set(activities.map(a => a.actor?.affiliate?.id).filter(Boolean)).size,
-      profileUpdates: activities.filter(a => a.action === 'profile_updated').length,
-      pageEdits: activities.filter(a => a.action === 'page_customized').length,
-      logins: activities.filter(a => a.action === 'affiliate_login').length,
+      totalActions: affiliateActivities.length,
+      activeAffiliates: new Set(
+        affiliateActivities
+          .map(a => a.actor?.affiliate?.id)
+          .filter(Boolean)
+      ).size,
+      profileUpdates: affiliateActivities.filter(a => a.action === 'profile_updated').length,
+      pageEdits: affiliateActivities.filter(a => a.action === 'page_customized').length,
+      logins: affiliateActivities.filter(a => a.action === 'affiliate_login').length,
     };
 
     return NextResponse.json({
-      activities,
+      activities: affiliateActivities,
       stats,
     });
   } catch (error) {
